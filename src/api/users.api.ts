@@ -8,7 +8,7 @@ export class UsersApi {
     const response = await this.request.post('/usuarios', { data: user });
 
     if (!response.ok()) {
-      throw new Error(`Falha ao criar usuario: ${response.status()} ${await response.text()}`);
+      throw new Error(`Failed to create user: ${response.status()} ${await response.text()}`);
     }
   }
 }

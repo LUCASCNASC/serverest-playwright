@@ -1,27 +1,27 @@
 # ServeRest Playwright
 
-Projeto de automacao E2E e API para a aplicacao ServeRest.
+E2E and API automation project for the ServeRest application.
 
-## Estrutura
+## Structure
 
-- `tests/e2e`: cenarios de interface organizados por funcionalidade.
-- `tests/api`: cenarios de API organizados por recurso.
-- `src/pages`: Page Objects da interface.
-- `src/api`: clientes das APIs.
-- `src/data`: factories e contratos de dados de teste.
-- `src/fixtures`: fixtures compartilhadas entre testes.
-- `src/config`: configuracoes e variaveis de ambiente.
-- `playwright.config.ts`: configuracao global da execucao.
+- `tests/e2e`: UI scenarios organized by feature.
+- `tests/api`: API scenarios organized by resource.
+- `src/pages`: UI Page Objects.
+- `src/api`: API clients.
+- `src/data`: factories and test data contracts.
+- `src/fixtures`: fixtures shared across tests.
+- `src/config`: environment variables and configuration.
+- `playwright.config.ts`: global test configuration.
 
-## Ambiente
+## Environment
 
-Copie `.env.example` para `.env` quando precisar sobrescrever URLs. O arquivo `.env` nao deve ser versionado.
+Copy `.env.example` to `.env` when you need to override URLs. The `.env` file must not be committed.
 
-## Comandos
+## Commands
 
-- `npm test`: executa todos os testes.
-- `npm run test:e2e`: executa testes de interface.
-- `npm run test:api`: executa testes de API.
-- `npm run test:headed`: executa com navegador visivel.
-- `npm run test:ui`: abre o modo UI do Playwright.
-- `npm run typecheck`: valida os tipos TypeScript.
+- `npm test`: runs all tests.
+- `npm run test:e2e`: runs UI tests.
+- `npm run test:api`: runs API tests.
+- `npm run test:headed`: runs tests with a visible browser.
+- `npm run test:ui`: opens Playwright UI mode.
+- `npm run typecheck`: checks TypeScript types.

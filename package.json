@@ -1,7 +1,7 @@
 {
   "name": "serverest-playwright",
   "version": "1.0.0",
-  "description": "Automacao E2E e de API da aplicacao ServeRest",
+  "description": "E2E and API automation project for the ServeRest application",
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
