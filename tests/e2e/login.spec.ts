@@ -2,7 +2,7 @@ import { test, expect } from '../../src/fixtures/test.js';
 import { LoginPage } from '../../src/pages/login.page.js';
 
 test.describe('Login', () => {
-  test('permite login de usuario normal', async ({ page, user }) => {
+  test('allows a normal user to log in', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -11,10 +11,10 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/home/);
   });
 
-  test.describe('usuario administrador', () => {
+  test.describe('administrator user', () => {
     test.use({ userRole: 'admin' });
 
-    test('permite login', async ({ page, user }) => {
+    test('allows an administrator to log in', async ({ page, user }) => {
       const loginPage = new LoginPage(page);
 
       await loginPage.open();
@@ -24,7 +24,7 @@ test.describe('Login', () => {
     });
   });
 
-  test('nao permite login com os campos em branco', async ({ page }) => {
+  test('does not allow login with blank fields', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -35,7 +35,7 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test('nao permite login com o email em branco', async ({ page, user }) => {
+  test('does not allow login with a blank email', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -45,7 +45,7 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test('nao permite login com a senha em branco', async ({ page, user }) => {
+  test('does not allow login with a blank password', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -55,35 +55,35 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test('nao permite login com email e senha errados', async ({ page }) => {
+  test('does not allow login with an invalid email and password', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
-    await loginPage.login('email.invalido@exemplo.com', 'senha-invalida');
+    await loginPage.login('invalid.email@example.com', 'invalid-password');
 
     await expect(page).toHaveURL(/login/);
   });
 
-  test('nao permite login com email errado', async ({ page, user }) => {
+  test('does not allow login with an invalid email', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
-    await loginPage.login('email.invalido@exemplo.com', user.password);
+    await loginPage.login('invalid.email@example.com', user.password);
 
     await expect(page).toHaveURL(/login/);
   });
 
-  test('nao permite login com senha errada', async ({ page, user }) => {
+  test('does not allow login with an invalid password', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
-    await loginPage.login(user.email, 'senha-invalida');
+    await loginPage.login(user.email, 'invalid-password');
 
     await expect(page).toHaveURL(/login/);
   });
 });
 
-test('exibe a tela de login', async ({ page }) => {
+test('displays the login page', async ({ page }) => {
   const loginPage = new LoginPage(page);
 
   await loginPage.open();
