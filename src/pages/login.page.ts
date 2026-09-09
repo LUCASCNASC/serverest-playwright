@@ -21,6 +21,12 @@ export class LoginPage {
     await this.loginButton.click();
   }
 
+  async submitWithEnter(email: string, password: string): Promise<void> {
+    await this.emailInput.fill(email);
+    await this.passwordInput.fill(password);
+    await this.passwordInput.press('Enter');
+  }
+
   async expectLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/login/);
   }
