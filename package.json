@@ -9,6 +9,8 @@
     "test:chromium": "playwright test --project=chromium",
     "test:api": "playwright test tests/api",
     "test:e2e": "playwright test tests/e2e",
+    "test:login": "playwright test tests/e2e/login.spec.ts",
+    "test:register": "playwright test tests/e2e/register.spec.ts",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit"
   },
