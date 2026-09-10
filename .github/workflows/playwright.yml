@@ -5,9 +5,25 @@ on:
   pull_request:
     branches: [ main, master ]
 jobs:
+  health-check:
+    name: Check test service health
+    runs-on: ubuntu-latest
+    env:
+      WEB_BASE_URL: ${{ vars.WEB_BASE_URL || 'https://front.serverest.dev' }}
+      API_BASE_URL: ${{ vars.API_BASE_URL || 'https://serverest.dev' }}
+    steps:
+    - name: Check frontend URL
+      run: curl --fail --location --silent --show-error --retry 3 --retry-delay 5 --retry-connrefused "$WEB_BASE_URL/login"
+    - name: Check API URL
+      run: curl --fail --location --silent --show-error --retry 3 --retry-delay 5 --retry-connrefused "$API_BASE_URL/usuarios"
+
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    needs: health-check
+    env:
+      WEB_BASE_URL: ${{ vars.WEB_BASE_URL || 'https://front.serverest.dev' }}
+      API_BASE_URL: ${{ vars.API_BASE_URL || 'https://serverest.dev' }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -19,9 +35,14 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
+    - name: Add test summary to workflow
+      if: ${{ !cancelled() }}
+      run: node scripts/generate-github-summary.mjs
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: playwright-report
-        path: playwright-report/
+        name: playwright-reports
+        path: |
+          playwright-report/
+          test-results/
         retention-days: 30
