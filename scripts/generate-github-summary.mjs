@@ -16,7 +16,11 @@ function collectSpecs(suite, parents = []) {
   for (const spec of suite.specs ?? []) {
     const results = spec.tests?.flatMap((test) => test.results ?? []) ?? [];
     const finalStatus = results.at(-1)?.status ?? 'skipped';
-    const status = finalStatus === 'timedOut' ? 'failed' : finalStatus;
+    const status = finalStatus === 'passed' && results.length > 1
+      ? 'flaky'
+      : ['timedOut', 'interrupted'].includes(finalStatus)
+        ? 'failed'
+        : finalStatus;
 
     rows.push({
       title: [...currentParents, spec.title].join(' > '),
@@ -36,14 +40,14 @@ for (const suite of report.suites ?? []) {
 const counts = rows.reduce((summary, row) => {
   summary[row.status] += 1;
   return summary;
-}, { passed: 0, failed: 0, skipped: 0 });
+}, { passed: 0, failed: 0, skipped: 0, flaky: 0 });
 
 const lines = [
   '# Playwright Test Report',
   '',
-  `| Total | Passed | Failed | Skipped |`,
-  `| ---: | ---: | ---: | ---: |`,
-  `| ${rows.length} | ${counts.passed} | ${counts.failed} | ${counts.skipped} |`,
+  `| Total | Passed | Flaky | Failed | Skipped |`,
+  `| ---: | ---: | ---: | ---: | ---: |`,
+  `| ${rows.length} | ${counts.passed} | ${counts.flaky} | ${counts.failed} | ${counts.skipped} |`,
   '',
   '## Scenarios',
   '',
