@@ -14,6 +14,7 @@ export const test = base.extend<UserFixtures>({
   user: async ({ playwright, userRole }, use) => {
     const apiContext = await playwright.request.newContext({
       baseURL: environment.apiBaseUrl,
+      timeout: 10_000,
     });
 
     const user = createUserData(userRole);

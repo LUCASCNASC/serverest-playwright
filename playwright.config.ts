@@ -25,8 +25,12 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Limit concurrency against the shared public test environment. */
+  workers: process.env.CI ? 1 : 2,
+  timeout: 30_000,
+  expect: {
+    timeout: 5_000,
+  },
   /* Reporters used locally and in CI. */
   reporter: [
     ['list'],
@@ -43,6 +47,8 @@ export default defineConfig({
     trace: 'on-first-retry',
     /* Capture visual evidence whenever a test fails. */
     screenshot: 'only-on-failure',
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
   },
 
   /* Chromium is the default target; add cross-browser projects when required. */
