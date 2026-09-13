@@ -9,6 +9,7 @@
     "test:chromium": "playwright test --project=chromium",
     "test:api": "playwright test tests/api",
     "test:e2e": "playwright test tests/e2e",
+    "test:a11y": "playwright test tests/e2e/accessibility.spec.ts",
     "test:login": "playwright test tests/e2e/login.spec.ts",
     "test:register": "playwright test tests/e2e/register.spec.ts",
     "report": "playwright show-report",
@@ -19,6 +20,7 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.5.0",
     "typescript": "^7.0.2"
