@@ -18,22 +18,29 @@ async function expectNoWcagViolations(page: Page): Promise<void> {
   expect(violations, JSON.stringify(violations, null, 2)).toEqual([]);
 }
 
-async function getKeyboardReachableControls(page: Page, tabCount: number): Promise<Set<string>> {
+async function getKeyboardReachableControls(page: Page, maxTabCount = 20): Promise<Set<string>> {
   const controls = new Set<string>();
 
-  for (let index = 0; index < tabCount; index += 1) {
+  for (let index = 0; index < maxTabCount; index += 1) {
     await page.keyboard.press('Tab');
-    const control = await page.evaluate(() => {
+    const activeElement = await page.evaluate(() => {
       const element = document.activeElement;
       if (!(element instanceof HTMLElement)) {
-        return null;
+        return { key: null, tagName: null };
       }
 
-      return element.getAttribute('data-testid') ?? element.getAttribute('placeholder') ?? element.tagName.toLowerCase();
+      return {
+        key: element.getAttribute('data-testid') ?? element.getAttribute('placeholder') ?? element.tagName.toLowerCase(),
+        tagName: element.tagName.toLowerCase(),
+      };
     });
 
-    if (control) {
-      controls.add(control);
+    if (activeElement.tagName === 'body') {
+      break;
+    }
+
+    if (activeElement.key) {
+      controls.add(activeElement.key);
     }
   }
 
@@ -66,7 +73,7 @@ test.describe('WCAG accessibility', () => {
     await expect(passwordInput).toHaveAccessibleName('Digite sua senha');
     await expect(loginButton).toHaveAccessibleName('Entrar');
 
-    const reachableControls = await getKeyboardReachableControls(page, 8);
+    const reachableControls = await getKeyboardReachableControls(page);
     expect([...reachableControls]).toEqual(expect.arrayContaining([
       'email',
       'senha',
@@ -83,7 +90,7 @@ test.describe('WCAG accessibility', () => {
     await expect(page.getByRole('checkbox', { name: 'Cadastrar como administrador?' })).toBeVisible();
     await expect(page.getByTestId('cadastrar')).toHaveAccessibleName('Cadastrar');
 
-    const reachableControls = await getKeyboardReachableControls(page, 15);
+    const reachableControls = await getKeyboardReachableControls(page);
     expect([...reachableControls]).toEqual(expect.arrayContaining([
       'nome',
       'email',
@@ -97,7 +104,7 @@ test.describe('WCAG accessibility', () => {
     test.fail(true, 'The external frontend renders Entrar without a keyboard-focusable link element.');
     await page.goto('/cadastrarusuarios');
 
-    const reachableControls = await getKeyboardReachableControls(page, 15);
+    const reachableControls = await getKeyboardReachableControls(page);
 
     expect([...reachableControls]).toContain('entrar');
   });
