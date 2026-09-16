@@ -12,6 +12,11 @@ E2E and API automation project for the ServeRest application.
 - `src/fixtures`: fixtures shared across tests.
 - `src/config`: environment variables and configuration.
 - `playwright.config.ts`: global test configuration.
+- `docs/QA_GUIDE.md`: onboarding, execution, test-data, reporting, and troubleshooting guide for QA.
+
+## QA Documentation
+
+For complete guidance on setting up the project, choosing the right command, understanding fixtures, reading reports, and adding tests, see [docs/QA_GUIDE.md](docs/QA_GUIDE.md).
 
 ## Environment
 
