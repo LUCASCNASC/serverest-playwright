@@ -179,6 +179,12 @@ Check TypeScript without running tests:
 npm run typecheck
 ```
 
+Audit dependencies for high-severity vulnerabilities:
+
+```powershell
+npm run audit
+```
+
 ## Reports and Evidence
 
 The Playwright configuration generates:
@@ -195,7 +201,7 @@ Open the HTML report locally:
 npm run report
 ```
 
-In GitHub Actions, the `health-check` job checks the frontend and API URLs before the test job starts. The test job uploads `playwright-report/` and `test-results/` as the `playwright-reports` artifact.
+In GitHub Actions, the `health-check` job checks the frontend and API URLs before the test job starts. The workflow runs `npm audit --audit-level=high`, uses read-only repository permissions, cancels obsolete runs for the same branch, and uploads `playwright-report/` and `test-results/` as the `playwright-reports` artifact for seven days.
 
 The workflow summary lists each scenario and its final status. A test that passes only after a retry is reported as `flaky`.
 

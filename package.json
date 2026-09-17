@@ -12,6 +12,7 @@
     "test:a11y": "playwright test tests/e2e/accessibility.spec.ts",
     "test:login": "playwright test tests/e2e/login.spec.ts",
     "test:register": "playwright test tests/e2e/register.spec.ts",
+    "audit": "npm audit --audit-level=high",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit"
   },
