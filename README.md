@@ -159,6 +159,12 @@ Check TypeScript without running tests:
 npm run typecheck
 ```
 
+Run ESLint against source files and tests:
+
+```powershell
+npm run lint
+```
+
 Audit dependencies for high-severity vulnerabilities:
 
 ```powershell
