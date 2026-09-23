@@ -1,5 +1,7 @@
 import { AxeBuilder } from '@axe-core/playwright';
 import { test, expect } from '../../src/fixtures/test.js';
+import { HomePage } from '../../src/pages/home.page.js';
+import { LoginPage } from '../../src/pages/login.page.js';
 import type { Page } from '@playwright/test';
 
 async function expectNoWcagViolations(page: Page): Promise<void> {
@@ -62,6 +64,19 @@ test.describe('WCAG accessibility', () => {
     await expectNoWcagViolations(page);
   });
 
+  test('home page has no automated WCAG A or AA violations', async ({ page, user }) => {
+    test.fail(true, 'The external frontend currently has known accessibility violations on the authenticated home screen.');
+
+    const loginPage = new LoginPage(page);
+    const homePage = new HomePage(page);
+
+    await loginPage.open();
+    await loginPage.login(user.email, user.password);
+    await homePage.expectLoaded();
+
+    await expectNoWcagViolations(page);
+  });
+
   test('login controls have accessible names and keyboard access', async ({ page }) => {
     await page.goto('/login');
 
@@ -98,6 +113,18 @@ test.describe('WCAG accessibility', () => {
       'checkbox',
       'cadastrar',
     ]));
+  });
+
+  test('home page controls are keyboard reachable', async ({ page, user }) => {
+    const loginPage = new LoginPage(page);
+    const homePage = new HomePage(page);
+
+    await loginPage.open();
+    await loginPage.login(user.email, user.password);
+    await homePage.expectLoaded();
+
+    const reachableControls = await getKeyboardReachableControls(page);
+    expect(reachableControls.size).toBeGreaterThan(0);
   });
 
   test('registration login link is keyboard accessible', async ({ page }) => {
