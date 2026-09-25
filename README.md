@@ -1,47 +1,52 @@
 # ServeRest Playwright
 
-Playwright automation project for the ServeRest web application and API. The project is written in TypeScript and currently runs browser tests in Chromium.
+Este projeto automatiza testes de interface e API do sistema ServeRest usando Playwright + TypeScript.
 
-## Quick Start
+O objetivo principal é validar cenários reais como login, cadastro, navegação e acessibilidade, sem depender de usuários fixos ou dados manuais.
 
-Run these commands from the project root:
+## O que o projeto cobre
 
-```powershell
-git clone <repository-url>
-Set-Location .\serverest-playwright
-npm ci
-npx playwright install chromium
-npm run typecheck
-npm test
-```
+- testes de login
+- testes de cadastro de usuário
+- acesso à home após autenticação
+- testes de API
+- testes de acessibilidade com Axe e navegação por teclado
+- relatórios e evidências de falha
 
-The application under test is external. The test suite does not start a local application server.
+## Requisitos
 
-## Requirements
+- Node.js LTS
+- npm
+- navegador Chromium instalado pelo Playwright
+- acesso à internet para as URLs do frontend e da API
+- terminal PowerShell no Windows ou shell equivalente em Linux/macOS
 
-- Node.js LTS.
-- npm, installed with Node.js.
-- Chromium installed through Playwright.
-- Network access to the ServeRest frontend and API.
-- PowerShell on Windows, or an equivalent shell on macOS/Linux.
-
-Check the installed versions:
+Verifique as versões:
 
 ```powershell
 node --version
 npm --version
 ```
 
-## Environment Configuration
+## Instalação rápida
 
-The default URLs are:
+Na raiz do projeto, execute:
+
+```powershell
+npm install
+npx playwright install chromium
+```
+
+## Configuração de ambiente
+
+O projeto usa duas URLs principais:
 
 ```text
 WEB_BASE_URL=https://front.serverest.dev
 API_BASE_URL=https://serverest.dev
 ```
 
-To use different environments, create a `.env` file in the project root:
+Crie um arquivo `.env` na raiz do projeto com o conteúdo abaixo:
 
 ```powershell
 @"
@@ -50,184 +55,173 @@ API_BASE_URL=https://serverest.dev
 "@ | Set-Content .env
 ```
 
-The Playwright configuration loads `.env` automatically. Never commit `.env`, credentials, tokens, or real user data.
+Importante:
 
-You can also override a URL for one PowerShell command without changing `.env`:
+- o arquivo `.env` é local e não deve entrar no Git
+- não salve credenciais reais, tokens ou dados sensíveis
+- o projeto lê esse arquivo automaticamente
 
-```powershell
-$env:WEB_BASE_URL = 'https://front.serverest.dev'; npm run test:e2e
-```
-
-## Project Structure
+## Estrutura do projeto
 
 ```text
 serverest-playwright/
-|-- .github/workflows/playwright.yml  # CI, health check, tests, and artifacts
-|-- scripts/                          # CI report helpers
-|-- src/
-|   |-- api/                           # API clients used by setup and API tests
-|   |-- config/                        # Environment configuration
-|   |-- data/                          # Data types and dynamic factories
-|   |-- fixtures/                      # Shared Playwright fixtures
-|   `-- pages/                         # Page Objects for UI screens
-|-- tests/
-|   |-- api/                           # API scenarios by resource
-|   `-- e2e/                           # Browser scenarios by feature
-|-- playwright.config.ts               # Playwright execution settings
-|-- package.json                       # Scripts and dependencies
-|-- package-lock.json                  # Locked dependency tree
-|-- test-results/                      # Generated failure evidence and reports
-`-- playwright-report/                 # Generated HTML report
+├── .github/workflows/         # CI do projeto
+├── docs/                      # documentação de apoio
+├── scripts/                   # utilitários de relatórios e suporte
+├── src/
+│   ├── api/                   # clientes de API usados nos testes
+│   ├── config/                # configuração de ambiente
+│   ├── data/                  # factories e dados dinâmicos
+│   ├── fixtures/              # fixtures compartilhadas do Playwright
+│   └── pages/                 # Page Objects da interface
+├── tests/
+│   ├── api/                   # testes de API
+│   └── e2e/                   # testes de interface
+├── .env                       # ambiente local (não versionado)
+├── commands.md                # referência rápida de comandos
+├── eslint.config.js           # configuração do ESLint
+├── playwright.config.ts       # configuração do Playwright
+├── package.json               # scripts e dependências
+├── tsconfig.json              # configuração do TypeScript
+├── playwright-report/         # relatório HTML gerado
+├── test-results/              # evidências de falha e artefatos
+└── README.md                  # documentação principal
 ```
 
-## Test Data
+## Como o projeto evita dados frágil
 
-Tests do not depend on permanent users. The shared `user` fixture creates a unique normal or administrator user through `POST /usuarios` before a test that needs an existing account.
+Os testes não usam usuários fixos gravados no sistema.
 
-Registration tests generate their own data with the factory. This keeps tests independent from the daily data reset and from execution order.
+O fixture `user` cria um usuário novo antes do teste, com papel de `normal` ou `admin`. Isso elimina dependência de dados que são apagados diariamente pelo ambiente externo.
 
-The default roles are:
+Essa estratégia deixa os testes:
 
-- `normal`: regular user.
-- `admin`: administrator user.
+- independentes da ordem de execução
+- mais estáveis
+- menos propensos a falhar por resets de dados
 
-## Commands
+## Comandos principais
 
-Run all tests in the terminal:
+### Executar tudo
 
 ```powershell
 npm test
 ```
 
-Run all UI/E2E tests:
+### Executar testes E2E
 
 ```powershell
 npm run test:e2e
 ```
 
-Run only the login suite:
+### Executar testes de login
 
 ```powershell
 npm run test:login
 ```
 
-Run only the registration suite:
+### Executar testes de cadastro
 
 ```powershell
 npm run test:register
 ```
 
-Run accessibility and WCAG checks:
+### Executar testes de acessibilidade
 
 ```powershell
 npm run test:a11y
 ```
 
-Run API tests:
+### Executar testes de API
 
 ```powershell
 npm run test:api
 ```
 
-Run with a visible browser:
+### Rodar com navegador visível
 
 ```powershell
 npm run test:headed
 ```
 
-Run one suite with a visible browser:
-
-```powershell
-npx playwright test tests/e2e/login.spec.ts --headed
-```
-
-Open Playwright UI mode:
+### Abrir a interface do Playwright
 
 ```powershell
 npm run test:ui
 ```
 
-Run only Chromium:
+### Rodar somente no Chromium
 
 ```powershell
 npm run test:chromium
 ```
 
-Check TypeScript without running tests:
+### Validar TypeScript
 
 ```powershell
 npm run typecheck
 ```
 
-Run ESLint against source files and tests:
+### Validar lint
 
 ```powershell
 npm run lint
 ```
 
-Audit dependencies for high-severity vulnerabilities:
+### Auditoria de vulnerabilidades
 
 ```powershell
 npm run audit
 ```
 
-## Reports and Failure Evidence
-
-Playwright generates the following files after execution:
-
-- `playwright-report/`: HTML report.
-- `test-results/playwright-results.xml`: JUnit report.
-- `test-results/playwright-results.json`: JSON report.
-- `test-results/<test-folder>/`: screenshots, traces, and error context for failures.
-
-Open the HTML report:
+### Abrir relatório HTML
 
 ```powershell
 npm run report
 ```
 
-Failure screenshots are configured with `screenshot: 'only-on-failure'`. Do not share reports outside the intended audience without checking for test credentials or personal data captured in the evidence.
+## Relatórios e evidências
 
-## CI Pipeline
+Ao rodar os testes, o projeto gera:
 
-The GitHub Actions workflow in `.github/workflows/playwright.yml`:
+- relatório HTML em `playwright-report/`
+- evidências em `test-results/`
+- screenshots de falhas
+- traces e contextos de erro
 
-1. Checks frontend and API availability.
-2. Installs dependencies with `npm ci`.
-3. Runs the dependency security audit.
-4. Installs Chromium and its system dependencies.
-5. Executes the Playwright suite.
-6. Publishes the HTML, JUnit, JSON, screenshots, and traces as artifacts.
+Esses artefatos ajudam a entender o que falhou antes de alterar o código dos testes.
 
-The CI job uses one worker to reduce contention against the shared environment. Local execution uses two workers.
+## CI e qualidade
 
-## Troubleshooting
+O workflow em `.github/workflows/playwright.yml` faz a verificação do ambiente, instala dependências, roda o audit, executa os testes e publica os relatórios como artefatos.
 
-### Application URL is unavailable
+## Dicas de solução de problemas
 
-Check the URLs manually:
+### O site não está acessível
+
+Verifique as URLs manualmente:
 
 ```powershell
 Invoke-WebRequest https://front.serverest.dev/login
 Invoke-WebRequest https://serverest.dev/usuarios
 ```
 
-If you use custom URLs, verify `WEB_BASE_URL` and `API_BASE_URL` in `.env`.
-
-### Browser is not installed
+### O navegador não foi instalado
 
 ```powershell
 npx playwright install chromium
 ```
 
-### A test fails in CI
+### Um teste falha de forma instável
 
-Open the HTML report and inspect the corresponding folder under `test-results/`. Look for the screenshot, `error-context.md`, and trace before changing timeouts or adding retries.
+Verifique:
 
-### User creation fails
+- o relatório HTML
+- o screenshot em `test-results/`
+- o erro contextual
+- a disponibilidade da API externa
+- a criação do usuário dinâmico
 
-The fixture creates users through the external API. Check API availability, response status, timeout, and whether the test is using unique data before changing the UI test.
+## Mais informações
 
-## Additional Documentation
-
-See [docs/QA_GUIDE.md](docs/QA_GUIDE.md) for detailed guidance on Page Objects, fixtures, test-data strategy, accessibility tests, reports, and adding new scenarios.
+Consulte o guia detalhado em [docs/QA_GUIDE.md](docs/QA_GUIDE.md) para conhecer melhor a estrutura, os fixtures, Page Objects e a estratégia de acessibilidade.

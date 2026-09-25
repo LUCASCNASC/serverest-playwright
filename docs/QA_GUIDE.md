@@ -1,262 +1,264 @@
-# QA Guide
+# Guia do QA
 
-This guide explains how to install, execute, maintain, and troubleshoot the ServeRest automated tests.
+Este guia explica de forma simples como instalar, executar, manter e diagnosticar os testes automatizados do ServeRest.
 
-## Purpose
+## Objetivo do projeto
 
-This project contains Playwright tests for the ServeRest web application and its API.
+Este repositório contém testes com Playwright para a interface web e a API do ServeRest.
 
-The current UI coverage includes:
+Os cenários atuais cobrem:
 
-- Login for normal users and administrators.
-- Invalid login attempts and required-field validation.
-- User registration for normal users and administrators.
-- Duplicate e-mail handling and registration navigation.
-- Accessibility checks for the login and registration pages using Axe and keyboard navigation.
+- login de usuário normal e administrador
+- erros de login e validação de campos obrigatórios
+- cadastro de usuários
+- tratamento de e-mail duplicado
+- navegação de login para cadastro e vice-versa
+- acessibilidade com Axe e navegação por teclado
+- validação da home após autenticação
 
-## Prerequisites
+## Pré-requisitos
 
-- Node.js LTS.
-- npm.
-- Access to the ServeRest frontend and API environments.
-- A Chromium browser installed through Playwright.
+- Node.js LTS
+- npm
+- acesso ao frontend e à API do ServeRest
+- navegador Chromium instalado via Playwright
 
-Install dependencies and browsers from the project root:
-
-```powershell
-npm ci
-npx playwright install --with-deps
-```
-
-For a local setup, copy `.env.example` to `.env` and adjust the URLs when necessary:
+Instale as dependências e o browser na raiz do projeto:
 
 ```powershell
-Copy-Item .env.example .env
+npm install
+npx playwright install chromium
 ```
 
-The `.env` file is local configuration and must not be committed.
+## URLs do sistema
 
-## Application URLs
+As URLs padrão são:
 
-Default URLs:
+- frontend: https://front.serverest.dev
+- API: https://serverest.dev
 
-- Frontend: `https://front.serverest.dev`
-- API: `https://serverest.dev`
-
-Environment variables:
+Variáveis de ambiente:
 
 ```text
 WEB_BASE_URL=https://front.serverest.dev
 API_BASE_URL=https://serverest.dev
 ```
 
-`WEB_BASE_URL` is used by browser navigation. `API_BASE_URL` is used by the API client and the user fixture.
+Esses valores são usados no Playwright para navegar no site e na API.
 
-## Project Structure
+## Arquivos importantes
 
 ```text
 src/
-  api/         API clients used for test setup and API scenarios.
-  config/      Environment configuration.
-  data/        Data types, roles, and dynamic factories.
-  fixtures/    Shared Playwright fixtures.
-  pages/       Page Objects for UI screens.
+  api/         clientes da API para setup e testes
+  config/      configuração de ambiente
+  data/        dados e factories dinâmicos
+  fixtures/    fixtures compartilhados
+  pages/       Page Objects para a interface
+
 tests/
-  e2e/         Browser scenarios organized by feature.
-  api/         API scenarios organized by resource.
-scripts/       CI reporting helpers.
-.github/       GitHub Actions workflows.
+  e2e/         testes de interface por funcionalidade
+  api/         testes de API por recurso
+
+.github/      workflow de CI
+scripts/       utilitários de suporte
 ```
 
-## Test Data Strategy
+## Estratégia de dados
 
-Tests must not depend on a user created manually or on data that survives overnight.
-The application clears data at the end of the day, so automated tests create their own data.
+Os testes não devem depender de usuários fixos ou permanentes.
 
-The `user` fixture:
+O ambiente externo é resetado diariamente, então o projeto cria seus próprios usuários antes da execução.
 
-1. Generates a unique user through `createUserData()`.
-2. Sets the role as `normal` or `admin`.
-3. Creates the user through `POST /usuarios`.
-4. Provides the credentials to the test.
-5. Disposes the API request context after the test.
+O fixture `user` faz isso automaticamente:
 
-Use the fixture when a test needs an existing user:
+1. gera um usuário único
+2. define o perfil como `normal` ou `admin`
+3. cria o registro via `POST /usuarios`
+4. entrega as credenciais para o teste
+5. fecha o contexto da API ao final
+
+Exemplo:
 
 ```ts
 import { test, expect } from '../../src/fixtures/test.js';
 
-test('example', async ({ user }) => {
+test('exemplo', async ({ user }) => {
   expect(user.email).toBeTruthy();
 });
 ```
 
-Use `test.use({ userRole: 'admin' })` at describe scope for administrator scenarios:
+Quando o cenário exige um usuário administrador, use:
 
 ```ts
-test.describe('administrator', () => {
+test.describe('administrador', () => {
   test.use({ userRole: 'admin' });
 });
 ```
 
-For registration scenarios, create a new user with the factory instead of using the fixture. Use the fixture only when a pre-existing user is required, such as duplicate e-mail coverage.
-
 ## Page Objects
 
-Page Objects contain selectors and reusable UI actions. Tests should describe behavior rather than repeat selectors.
+Os Page Objects centralizam seletores e ações da interface. Eles ajudam o teste a focar no comportamento e não repetir código em cada cenário.
 
-Current Page Objects:
+Objetos atuais:
 
-- `LoginPage`: opens the login screen and submits credentials.
-- `RegisterPage`: opens the registration screen, submits users, and navigates to login.
+- `LoginPage`: abre a tela de login e envia credenciais
+- `HomePage`: valida que a autenticação levou para a home
 
-Prefer stable selectors already provided by the application:
+Preferência de seletor:
 
-- Registration: `data-testid` selectors.
-- Login: placeholders and accessible roles currently exposed by the application.
+- login: placeholders e roles acessíveis
+- cadastro: `data-testid`
 
-Do not add arbitrary sleeps such as `waitForTimeout`. Prefer Playwright web-first assertions, which wait for the expected state.
+Evite `waitForTimeout` sem necessidade. Prefira asserções do Playwright, que esperam o elemento ou estado correto.
 
-## Test Commands
+## Comandos de execução
 
-Run all tests:
+Executar todos os testes:
 
 ```powershell
 npm test
 ```
 
-Run only browser tests:
+Executar somente os testes E2E:
 
 ```powershell
 npm run test:e2e
 ```
 
-Run login tests:
+Executar testes de login:
 
 ```powershell
 npm run test:login
 ```
 
-Run registration tests:
+Executar testes de cadastro:
 
 ```powershell
 npm run test:register
 ```
 
-Run accessibility tests:
+Executar testes de acessibilidade:
 
 ```powershell
 npm run test:a11y
 ```
 
-Run API tests:
+Executar testes de API:
 
 ```powershell
 npm run test:api
 ```
 
-Run with a visible browser:
+Executar com navegador visível:
 
 ```powershell
 npm run test:headed
 ```
 
-Run a specific file with a visible browser:
+Executar um arquivo específico com navegador visível:
 
 ```powershell
 npx playwright test tests/e2e/login.spec.ts --headed
 ```
 
-Open Playwright UI mode:
+Abrir a interface do Playwright:
 
 ```powershell
 npm run test:ui
 ```
 
-Check TypeScript without running tests:
+Validar TypeScript:
 
 ```powershell
 npm run typecheck
 ```
 
-Run ESLint against source files and tests:
+Executar ESLint:
 
 ```powershell
 npm run lint
 ```
 
-Audit dependencies for high-severity vulnerabilities:
+Auditar vulnerabilidades de dependências:
 
 ```powershell
 npm run audit
 ```
 
-## Reports and Evidence
+## Relatórios
 
-The Playwright configuration generates:
+O projeto gera:
 
-- HTML report in `playwright-report/`.
-- JUnit report in `test-results/playwright-results.xml`.
-- JSON report in `test-results/playwright-results.json`.
-- Screenshots for failed tests in `test-results/`.
-- Traces on the first retry of a failed test.
+- HTML em `playwright-report/`
+- JUnit em `test-results/playwright-results.xml`
+- JSON em `test-results/playwright-results.json`
+- screenshots e traces em `test-results/`
 
-Open the HTML report locally:
+Abra o relatório HTML com:
 
 ```powershell
 npm run report
 ```
 
-In GitHub Actions, the `health-check` job checks the frontend and API URLs before the test job starts. The workflow runs `npm audit --audit-level=high`, uses read-only repository permissions, cancels obsolete runs for the same branch, and uploads `playwright-report/` and `test-results/` as the `playwright-reports` artifact for seven days.
+## Testes de acessibilidade
 
-The workflow summary lists each scenario and its final status. A test that passes only after a retry is reported as `flaky`.
+A suíte de acessibilidade usa `@axe-core/playwright` com regras WCAG 2.0 A e AA.
 
-## Accessibility Tests
+Ela valida:
 
-The accessibility suite uses `@axe-core/playwright` with WCAG 2.0 A and AA tags. It checks both automated rules and keyboard access.
+- violações automáticas
+- acessibilidade por teclado
+- nomes e rótulos dos elementos
 
-A failure is evidence of an accessibility issue, not a reason to weaken the test. Known issues in the external frontend may be marked with `test.fail()` temporarily, but the issue should remain documented and the marker should be removed after the frontend is fixed.
+Se houver falha, ela é evidência real de problema. Quando a aplicação externa já tem um problema conhecido, o projeto registra isso com `test.fail()` para manter o rastreio documentado.
 
-The current external application has reported issues involving:
+Problemas conhecidos do frontend externo incluem:
 
-- Missing alternative text on the logo image.
-- Insufficient color contrast.
-- The registration `Entrar` control not being keyboard-focusable.
+- imagem sem texto alternativo
+- contraste insuficiente
+- link de login que não recebe foco por teclado
 
-These frontend issues cannot be fixed in this automation repository.
+Esses itens não são corrigidos neste repositório de automação.
 
 ## Troubleshooting
 
-### Tests cannot reach the application
+### O sistema não está acessível
 
-Check the URLs and run the health checks manually:
+Verifique manualmente:
 
 ```powershell
 Invoke-WebRequest "$env:WEB_BASE_URL/login"
 Invoke-WebRequest "$env:API_BASE_URL/usuarios"
 ```
 
-If the environment variables are not set, use the default URLs documented above.
+### Um usuário não consegue ser criado
 
-### A user cannot be created
+Pode ser problema da API externa, rede, timeout ou resposta inválida. Verifique a resposta da API no output do teste antes de mudar a automação.
 
-The failure may come from the external API, network instability, timeout, or an invalid response. Check the API response in the test output and the current API availability before changing the test.
+### O teste falha só no CI
 
-### A test fails only in CI
+Revise, em ordem:
 
-Review, in order:
+1. relatório HTML
+2. screenshot em `test-results/`
+3. trace da falha
+4. resumo do workflow
+5. resultado do health check
 
-1. The HTML report.
-2. The screenshot in `test-results/`.
-3. The trace from the first retry.
-4. The GitHub Actions summary to see whether the scenario was marked `flaky`.
-5. The environment health-check result.
+### Testes de acessibilidade falham
 
-Do not increase timeouts or retries before identifying whether the failure is caused by the application, test data, network, or selector.
+Leia a descrição da violação e os elementos afetados. Não ignore a falha apenas para deixar o pipeline verde.
 
-### Accessibility tests fail
+## Resumo
 
-Read the Axe violation id and affected nodes. Do not ignore a violation only to make the pipeline green. Confirm whether the issue belongs to this repository or to the external ServeRest frontend.
+O projeto foi pensado para ser:
+
+- estável
+- reutilizável
+- independente de dados fixos
+- fácil de manter
+- confiável para validação de regressão e acessibilidade
 
 ## Adding New Tests
 
