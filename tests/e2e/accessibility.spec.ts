@@ -89,6 +89,7 @@ test.describe('WCAG accessibility', () => {
     await expect(loginButton).toHaveAccessibleName('Entrar');
 
     const reachableControls = await getKeyboardReachableControls(page);
+
     expect([...reachableControls]).toEqual(expect.arrayContaining([
       'email',
       'senha',
@@ -106,6 +107,7 @@ test.describe('WCAG accessibility', () => {
     await expect(page.getByTestId('cadastrar')).toHaveAccessibleName('Cadastrar');
 
     const reachableControls = await getKeyboardReachableControls(page);
+    
     expect([...reachableControls]).toEqual(expect.arrayContaining([
       'nome',
       'email',
