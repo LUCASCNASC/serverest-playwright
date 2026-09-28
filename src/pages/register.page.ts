@@ -17,7 +17,7 @@ export class RegisterPage {
     this.administratorCheckbox = page.getByTestId('checkbox');
     this.registerButton = page.getByTestId('cadastrar');
     this.loginLink = page.getByTestId('entrar');
-  }
+  };
 
   /** Opens the registration route using Playwright's configured base URL. */
   async open(): Promise<void> {
@@ -35,7 +35,7 @@ export class RegisterPage {
     }
 
     await this.registerButton.click();
-  }
+  };
 
   /** Submits arbitrary values for positive and negative registration scenarios. */
   async submit(name: string, email: string, password: string, administrator = false): Promise<void> {
@@ -48,7 +48,7 @@ export class RegisterPage {
     }
 
     await this.registerButton.click();
-  }
+  };
 
   /** Submits arbitrary values through the keyboard instead of clicking the button. */
   async submitWithEnter(name: string, email: string, password: string, administrator = false): Promise<void> {
@@ -61,7 +61,7 @@ export class RegisterPage {
     }
 
     await this.passwordInput.press('Enter');
-  }
+  };
 
   /** Confirms that the registration route is still open. */
   async expectLoaded(): Promise<void> {
@@ -72,4 +72,4 @@ export class RegisterPage {
   async goToLogin(): Promise<void> {
     await this.loginLink.click();
   }
-}
+};

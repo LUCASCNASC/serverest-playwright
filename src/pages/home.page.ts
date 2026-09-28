@@ -8,4 +8,4 @@ export class HomePage {
   async expectLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/home(?:$|[?#])/);
   }
-}
+};

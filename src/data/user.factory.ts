@@ -17,4 +17,4 @@ export function createUserData(role: UserRole = 'normal'): UserData {
     password: faker.internet.password({ length: 12 }),
     administrador: role === 'admin' ? 'true' : 'false',
   };
-}
+};
