@@ -23,4 +23,4 @@ export class UsersApi {
 
     return body._id;
   }
-}
+};
