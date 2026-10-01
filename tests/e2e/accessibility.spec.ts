@@ -47,7 +47,7 @@ async function getKeyboardReachableControls(page: Page, maxTabCount = 20): Promi
   }
 
   return controls;
-}
+};
 
 test.describe('WCAG accessibility.', () => {
   test('Login page has no automated WCAG A or AA violations.', async ({ page }) => {
