@@ -3,8 +3,8 @@ import { createUserData } from '../../src/data/user.factory.js';
 import { RegisterPage } from '../../src/pages/register.page.js';
 import { LoginPage } from '../../src/pages/login.page.js';
 
-test.describe('User registration', () => {
-  test('Registers a normal user successfully', async ({ page }) => {
+test.describe('User registration.', () => {
+  test('Registers a normal user successfully.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const user = createUserData('normal');
 
@@ -14,7 +14,7 @@ test.describe('User registration', () => {
     await expect(page).toHaveURL(/home/);
   });
 
-  test('Allows the newly registered user to log in', async ({ page }) => {
+  test('Allows the newly registered user to log in.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const loginPage = new LoginPage(page);
     const user = createUserData('normal');
@@ -29,7 +29,7 @@ test.describe('User registration', () => {
     await expect(page).toHaveURL(/home/);
   });
 
-  test('Registers an administrator successfully', async ({ page }) => {
+  test('Registers an administrator successfully.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const user = createUserData('admin');
 
@@ -39,7 +39,7 @@ test.describe('User registration', () => {
     await expect(page).toHaveURL(/home/);
   });
 
-  test('Displays the registration page with the expected controls', async ({ page }) => {
+  test('Displays the registration page with the expected controls.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
 
     await registerPage.open();
@@ -53,7 +53,7 @@ test.describe('User registration', () => {
     await expect(page.getByTestId('entrar')).toBeVisible();
   });
 
-  test('Exposes the expected input types and name', async ({ page }) => {
+  test('Exposes the expected input types and name.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
 
     await registerPage.open();
@@ -68,7 +68,7 @@ test.describe('User registration', () => {
     await expect(page.getByTestId('checkbox')).toHaveAttribute('name', 'administrador');
   });
 
-  test('Does not register a user with all fields blank', async ({ page }) => {
+  test('Does not register a user with all fields blank.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
 
     await registerPage.open();
@@ -77,7 +77,7 @@ test.describe('User registration', () => {
     await expect(page).toHaveURL(/cadastrarusuarios/);
   });
 
-  test('Does not register a user with a blank name', async ({ page }) => {
+  test('Does not register a user with a blank name.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const user = createUserData();
 
@@ -87,7 +87,7 @@ test.describe('User registration', () => {
     await expect(page).toHaveURL(/cadastrarusuarios/);
   });
 
-  test('Does not register a user with a blank email', async ({ page }) => {
+  test('Does not register a user with a blank email.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const user = createUserData();
 
@@ -97,7 +97,7 @@ test.describe('User registration', () => {
     await expect(page).toHaveURL(/cadastrarusuarios/);
   });
 
-  test('Does not register a user with a blank password', async ({ page }) => {
+  test('Does not register a user with a blank password.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const user = createUserData();
 
@@ -107,7 +107,7 @@ test.describe('User registration', () => {
     await expect(page).toHaveURL(/cadastrarusuarios/);
   });
 
-  test('Does not register a user with an invalid email format', async ({ page }) => {
+  test('Does not register a user with an invalid email format.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const user = createUserData();
 
@@ -117,7 +117,7 @@ test.describe('User registration', () => {
     await expect(page).toHaveURL(/cadastrarusuarios/);
   });
 
-  test('Does not register a user with a duplicated email', async ({ page, user }) => {
+  test('Does not register a user with a duplicated email.', async ({ page, user }) => {
     const registerPage = new RegisterPage(page);
 
     await registerPage.open();
@@ -127,7 +127,7 @@ test.describe('User registration', () => {
     await expect(page.getByText('Este email já está sendo usado')).toBeVisible();
   });
 
-  test('Preserves the submitted values after a duplicated email error', async ({ page, user }) => {
+  test('Preserves the submitted values after a duplicated email error.', async ({ page, user }) => {
     const registerPage = new RegisterPage(page);
 
     await registerPage.open();
@@ -139,7 +139,7 @@ test.describe('User registration', () => {
     await expect(page.getByTestId('checkbox')).not.toBeChecked();
   });
 
-  test('Allows selecting and clearing the administrator option', async ({ page }) => {
+  test('Allows selecting and clearing the administrator option.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
 
     await registerPage.open();
@@ -150,7 +150,7 @@ test.describe('User registration', () => {
     await expect(page.getByTestId('checkbox')).not.toBeChecked();
   });
 
-  test('Navigates to the login page', async ({ page }) => {
+  test('Navigates to the login page.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
 
     await registerPage.open();
@@ -159,7 +159,7 @@ test.describe('User registration', () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test('Submits the form with the Enter key', async ({ page }) => {
+  test('Submits the form with the Enter key.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
     const user = createUserData();
 
@@ -169,7 +169,7 @@ test.describe('User registration', () => {
     await expect(page).toHaveURL(/home/);
   });
 
-  test('Masks the password field', async ({ page }) => {
+  test('Masks the password field.', async ({ page }) => {
     const registerPage = new RegisterPage(page);
 
     await registerPage.open();
