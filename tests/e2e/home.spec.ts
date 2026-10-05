@@ -16,7 +16,7 @@ test.describe('Home', () => {
   test.describe('administrator user.', () => {
     test.use({ userRole: 'admin' });
 
-    test('Allows an administrator to reach home after login', async ({ page, user }) => {
+    test('allows an administrator to reach home after login', async ({ page, user }) => {
       const loginPage = new LoginPage(page);
       const homePage = new HomePage(page);
 
