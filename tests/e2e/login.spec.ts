@@ -2,7 +2,7 @@ import { test, expect } from '../../src/fixtures/test.js';
 import { LoginPage } from '../../src/pages/login.page.js';
 
 test.describe('Login', () => {
-  test('Allows a normal user to log in.', async ({ page, user }) => {
+  test('allows a normal user to log in', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -11,7 +11,7 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/home/);
   });
 
-  test.describe('administrator user.', () => {
+  test.describe('administrator user', () => {
     test.use({ userRole: 'admin' });
 
     test('allows an administrator to log in.', async ({ page, user }) => {
@@ -24,7 +24,7 @@ test.describe('Login', () => {
     });
   });
 
-  test('does not allow login with blank fields.', async ({ page }) => {
+  test('does not allow login with blank fields', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -35,7 +35,7 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test('does not allow login with a blank email.', async ({ page, user }) => {
+  test('does not allow login with a blank email', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -45,7 +45,7 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test('does not allow login with a blank password.', async ({ page, user }) => {
+  test('does not allow login with a blank password', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -55,7 +55,7 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test('does not allow login with an invalid email and password.', async ({ page }) => {
+  test('does not allow login with an invalid email and password', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -64,7 +64,7 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test('does not allow login with an invalid email.', async ({ page, user }) => {
+  test('does not allow login with an invalid email', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -73,7 +73,7 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test('does not allow login with an invalid password.', async ({ page, user }) => {
+  test('does not allow login with an invalid password', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.open();
@@ -83,7 +83,7 @@ test.describe('Login', () => {
   });
 });
 
-test('displays the login page.', async ({ page }) => {
+test('displays the login page', async ({ page }) => {
   const loginPage = new LoginPage(page);
 
   await loginPage.open();
@@ -95,7 +95,7 @@ test('displays the login page.', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Entrar' })).toBeVisible();
 });
 
-test('exposes the expected login field types.', async ({ page }) => {
+test('exposes the expected login field types', async ({ page }) => {
   const loginPage = new LoginPage(page);
 
   await loginPage.open();
@@ -104,7 +104,7 @@ test('exposes the expected login field types.', async ({ page }) => {
   await expect(page.getByPlaceholder('Digite sua senha')).toHaveAttribute('type', 'password');
 });
 
-test('does not allow login with an invalid email format.', async ({ page, user }) => {
+test('does not allow login with an invalid email format', async ({ page, user }) => {
   const loginPage = new LoginPage(page);
 
   await loginPage.open();
@@ -113,7 +113,7 @@ test('does not allow login with an invalid email format.', async ({ page, user }
   await expect(page).toHaveURL(/login/);
 });
 
-test('preserves credentials after an unsuccessful login attempt.', async ({ page, user }) => {
+test('preserves credentials after an unsuccessful login attempt', async ({ page, user }) => {
   const loginPage = new LoginPage(page);
 
   await loginPage.open();
@@ -123,7 +123,7 @@ test('preserves credentials after an unsuccessful login attempt.', async ({ page
   await expect(page.getByPlaceholder('Digite sua senha')).toHaveValue('invalid-password');
 });
 
-test('allows login submission with the Enter key.', async ({ page, user }) => {
+test('allows login submission with the Enter key', async ({ page, user }) => {
   const loginPage = new LoginPage(page);
 
   await loginPage.open();

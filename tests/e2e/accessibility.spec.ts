@@ -49,8 +49,8 @@ async function getKeyboardReachableControls(page: Page, maxTabCount = 20): Promi
   return controls;
 };
 
-test.describe('WCAG accessibility.', () => {
-  test('login page has no automated WCAG A or AA violations.', async ({ page }) => {
+test.describe('WCAG accessibility', () => {
+  test('login page has no automated WCAG A or AA violations', async ({ page }) => {
     test.fail(true, 'The external frontend currently has known contrast and image-alt violations.');
     await page.goto('/login');
 
@@ -64,7 +64,7 @@ test.describe('WCAG accessibility.', () => {
     await expectNoWcagViolations(page);
   });
 
-  test('home page has no automated WCAG A or AA violations.', async ({ page, user }) => {
+  test('home page has no automated WCAG A or AA violations', async ({ page, user }) => {
     test.fail(true, 'The external frontend currently has known accessibility violations on the authenticated home screen.');
 
     const loginPage = new LoginPage(page);
@@ -77,7 +77,7 @@ test.describe('WCAG accessibility.', () => {
     await expectNoWcagViolations(page);
   });
 
-  test('login controls have accessible names and keyboard access.', async ({ page }) => {
+  test('login controls have accessible names and keyboard access', async ({ page }) => {
     await page.goto('/login');
 
     const emailInput = page.getByPlaceholder('Digite seu email');
@@ -97,7 +97,7 @@ test.describe('WCAG accessibility.', () => {
     ]));
   });
 
-  test('registration controls have accessible names and keyboard access.', async ({ page }) => {
+  test('registration controls have accessible names and keyboard access', async ({ page }) => {
     await page.goto('/cadastrarusuarios');
 
     await expect(page.getByTestId('nome')).toHaveAccessibleName('Digite seu nome');
@@ -117,7 +117,7 @@ test.describe('WCAG accessibility.', () => {
     ]));
   });
 
-  test('home page controls are keyboard reachable.', async ({ page, user }) => {
+  test('home page controls are keyboard reachable', async ({ page, user }) => {
     const loginPage = new LoginPage(page);
     const homePage = new HomePage(page);
 
@@ -129,7 +129,7 @@ test.describe('WCAG accessibility.', () => {
     expect(reachableControls.size).toBeGreaterThan(0);
   });
 
-  test('registration login link is keyboard accessible.', async ({ page }) => {
+  test('registration login link is keyboard accessible', async ({ page }) => {
     test.fail(true, 'The external frontend renders Entrar without a keyboard-focusable link element.');
     await page.goto('/cadastrarusuarios');
 
