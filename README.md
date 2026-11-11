@@ -8,6 +8,7 @@ O objetivo principal é validar cenários reais como login, cadastro, navegaçã
 
 - testes de login
 - testes de cadastro de usuário
+- testes de cadastro de usuários pela área administrativa, incluindo a confirmação do perfil na listagem
 - acesso à home após autenticação
 - testes de API
 - testes de acessibilidade com Axe e navegação por teclado

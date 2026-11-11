@@ -12,6 +12,9 @@ Current Page Objects:
 
 - `LoginPage`: opens login, submits credentials by button or keyboard, and checks the login route.
 - `RegisterPage`: opens registration, submits normal or administrator users, and navigates to login.
+- `AdminRegisterPage`: submits users through the administrator area.
+- `UsersListPage`: checks that an administrator-created user appears with the submitted name, e-mail, password, and role.
+- `HomePage`: opens the administrator user-registration screen from the home card.
 
 When adding a screen:
 
@@ -26,6 +29,13 @@ When adding a screen:
 Use `createUserData()` for registration scenarios. Use the `user` fixture when a test needs a user that already exists, such as login or duplicate e-mail validation.
 
 Do not share credentials between tests. Each test should create or receive its own data so execution order and parallel workers do not affect the result.
+Admin-area registration tests use a newly created administrator fixture and dynamically generated users; they verify successful registrations in the users list, including the `Administrador` value. These tests write temporary data to the external ServeRest environment, which is reset nightly.
+
+## Registration validation and authorization
+
+Required-field scenarios assert the corresponding visible validation messages, and malformed e-mails are checked against the browser's native email constraint. Administrator registration and list routes are also tested with no session and with a normal user.
+
+The current public ServeRest frontend allows a normal user to open both administrator routes directly. The normal-user authorization tests intentionally fail while that behavior remains, so the gap stays visible in test runs rather than being hidden as an expected failure. Do not try to create an administrator through this unauthorized path in tests.
 
 ## Assertions and Stability
 
