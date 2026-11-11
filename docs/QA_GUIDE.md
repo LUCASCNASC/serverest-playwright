@@ -11,7 +11,9 @@ Os cenários atuais cobrem:
 - login de usuário normal e administrador
 - erros de login e validação de campos obrigatórios
 - cadastro de usuários
+- cadastro de usuários pela área administrativa, com validação dos dados e do perfil na lista
 - tratamento de e-mail duplicado
+- validação explícita de campos obrigatórios e proteção das rotas administrativas
 - navegação de login para cadastro e vice-versa
 - acessibilidade com Axe e navegação por teclado
 - validação da home após autenticação
@@ -88,6 +90,10 @@ test('exemplo', async ({ user }) => {
 });
 ```
 
+Os testes de cadastro pela área administrativa também usam um administrador criado para o próprio teste. Após cadastrar, validam a linha correspondente em `/admin/listarusuarios`, incluindo a coluna `Administrador` (`true` ou `false`), sem depender de contas que permaneçam no ambiente externo.
+
+Os testes também verificam mensagens de validação, formato de e-mail e acesso às rotas administrativas sem sessão ou com usuário normal. No momento, o frontend público permite que um usuário normal acesse diretamente o cadastro e a listagem administrativa; os cenários correspondentes ficam falhando intencionalmente para evidenciar esse problema até que o serviço seja corrigido. Os testes não tentam cadastrar administradores por esse caminho.
+
 Quando o cenário exige um usuário administrador, use:
 
 ```ts
@@ -104,6 +110,8 @@ Objetos atuais:
 
 - `LoginPage`: abre a tela de login e envia credenciais
 - `HomePage`: valida que a autenticação levou para a home
+- `AdminRegisterPage`: envia cadastros pela área administrativa
+- `UsersListPage`: valida nome, e-mail, senha e perfil do usuário cadastrado na listagem
 
 Preferência de seletor:
 

@@ -8,4 +8,9 @@ export class HomePage {
   async expectLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/home(?:$|[?#])/);
   }
+
+  /** Opens user registration from the administrator home screen. */
+  async openUserRegistration(): Promise<void> {
+    await this.page.getByTestId('cadastrarUsuarios').click();
+  }
 };
