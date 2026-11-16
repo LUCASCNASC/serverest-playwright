@@ -8,7 +8,7 @@ test.describe('Login', () => {
     await loginPage.open();
     await loginPage.login(user.email, user.password);
 
-    await expect(page).toHaveURL(/home/);
+    await expect(page).toHaveURL(/\/home(?:$|[?#])/);
   });
 
   test.describe('administrator user', () => {
@@ -20,7 +20,7 @@ test.describe('Login', () => {
       await loginPage.open();
       await loginPage.login(user.email, user.password);
 
-      await expect(page).toHaveURL(/home/);
+      await expect(page).toHaveURL(/\/home(?:$|[?#])/);
     });
   });
 
@@ -32,7 +32,7 @@ test.describe('Login', () => {
 
     await expect(page.getByRole('alert').filter({ hasText: 'Email é obrigatório' })).toBeVisible();
     await expect(page.getByRole('alert').filter({ hasText: 'Password é obrigatório' })).toBeVisible();
-    await expect(page).toHaveURL(/login/);
+    await expect(page).toHaveURL(/\/login(?:$|[?#])/);
   });
 
   test('does not allow login with a blank email', async ({ page, user }) => {
@@ -42,7 +42,7 @@ test.describe('Login', () => {
     await loginPage.login('', user.password);
 
     await expect(page.getByRole('alert').filter({ hasText: 'Email é obrigatório' })).toBeVisible();
-    await expect(page).toHaveURL(/login/);
+    await expect(page).toHaveURL(/\/login(?:$|[?#])/);
   });
 
   test('does not allow login with a blank password', async ({ page, user }) => {
@@ -52,7 +52,7 @@ test.describe('Login', () => {
     await loginPage.login(user.email, '');
 
     await expect(page.getByRole('alert').filter({ hasText: 'Password é obrigatório' })).toBeVisible();
-    await expect(page).toHaveURL(/login/);
+    await expect(page).toHaveURL(/\/login(?:$|[?#])/);
   });
 
   test('does not allow login with an invalid email and password', async ({ page }) => {
@@ -61,7 +61,7 @@ test.describe('Login', () => {
     await loginPage.open();
     await loginPage.login('invalid.email@example.com', 'invalid-password');
 
-    await expect(page).toHaveURL(/login/);
+    await expect(page).toHaveURL(/\/login(?:$|[?#])/);
   });
 
   test('does not allow login with an invalid email', async ({ page, user }) => {
@@ -70,7 +70,7 @@ test.describe('Login', () => {
     await loginPage.open();
     await loginPage.login('invalid.email@example.com', user.password);
 
-    await expect(page).toHaveURL(/login/);
+    await expect(page).toHaveURL(/\/login(?:$|[?#])/);
   });
 
   test('does not allow login with an invalid password', async ({ page, user }) => {
@@ -79,7 +79,7 @@ test.describe('Login', () => {
     await loginPage.open();
     await loginPage.login(user.email, 'invalid-password');
 
-    await expect(page).toHaveURL(/login/);
+    await expect(page).toHaveURL(/\/login(?:$|[?#])/);
   });
 });
 
@@ -110,7 +110,7 @@ test('does not allow login with an invalid email format', async ({ page, user })
   await loginPage.open();
   await loginPage.login('invalid-email', user.password);
 
-  await expect(page).toHaveURL(/login/);
+  await expect(page).toHaveURL(/\/login(?:$|[?#])/);
 });
 
 test('preserves credentials after an unsuccessful login attempt', async ({ page, user }) => {
@@ -129,5 +129,5 @@ test('allows login submission with the Enter key', async ({ page, user }) => {
   await loginPage.open();
   await loginPage.submitWithEnter(user.email, user.password);
 
-  await expect(page).toHaveURL(/home/);
+  await expect(page).toHaveURL(/\/home(?:$|[?#])/);
 });

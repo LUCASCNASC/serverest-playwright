@@ -19,14 +19,14 @@ dotenv.config({ path: path.resolve(projectDirectory, '.env') });
  */
 export default defineConfig({
   testDir: './tests',
-  /* Run tests in files in parallel */
+  /* Keep load predictable against the shared public test environment. */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Limit concurrency against the shared public test environment. */
-  workers: process.env.CI ? 1 : 2,
+  /* Retry once in CI, but fail if a retry was needed so flakes remain visible. */
+  retries: process.env.CI ? 1 : 0,
+  failOnFlakyTests: !!process.env.CI,
+  workers: 1,
   timeout: 30_000,
   expect: {
     timeout: 5_000,

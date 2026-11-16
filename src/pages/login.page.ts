@@ -33,6 +33,6 @@ export class LoginPage {
 
   /** Confirms that the login route is still open. */
   async expectLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(/login/);
+    await expect(this.page).toHaveURL(/\/login(?:$|[?#])/);
   }
 };
