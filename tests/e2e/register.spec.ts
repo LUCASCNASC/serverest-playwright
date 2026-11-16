@@ -23,7 +23,7 @@ test.describe('User registration', () => {
     await registerPage.open();
     await registerPage.register(user);
 
-    await expect(page).toHaveURL(/home/);
+    await expect(page).toHaveURL(/\/home(?:$|[?#])/);
   });
 
   test('allows the newly registered user to log in', async ({ page }) => {
@@ -33,12 +33,12 @@ test.describe('User registration', () => {
 
     await registerPage.open();
     await registerPage.register(user);
-    await expect(page).toHaveURL(/home/);
+    await expect(page).toHaveURL(/\/home(?:$|[?#])/);
 
     await loginPage.open();
     await loginPage.login(user.email, user.password);
 
-    await expect(page).toHaveURL(/home/);
+    await expect(page).toHaveURL(/\/home(?:$|[?#])/);
   });
 
   test('registers an administrator successfully', async ({ page }) => {
@@ -96,7 +96,7 @@ test.describe('User registration', () => {
     await registerPage.open();
     await registerPage.submit('', '', '');
 
-    await expect(page).toHaveURL(/cadastrarusuarios/);
+    await expect(page).toHaveURL(/\/cadastrarusuarios(?:$|[?#])/);
     await expectRequiredFieldError(page, 'Nome');
     await expectRequiredFieldError(page, 'Email');
     await expectRequiredFieldError(page, 'Password');
@@ -109,7 +109,7 @@ test.describe('User registration', () => {
     await registerPage.open();
     await registerPage.submit('', user.email, user.password);
 
-    await expect(page).toHaveURL(/cadastrarusuarios/);
+    await expect(page).toHaveURL(/\/cadastrarusuarios(?:$|[?#])/);
     await expectRequiredFieldError(page, 'Nome');
   });
 
@@ -120,7 +120,7 @@ test.describe('User registration', () => {
     await registerPage.open();
     await registerPage.submit(user.nome, '', user.password);
 
-    await expect(page).toHaveURL(/cadastrarusuarios/);
+    await expect(page).toHaveURL(/\/cadastrarusuarios(?:$|[?#])/);
     await expectRequiredFieldError(page, 'Email');
   });
 
@@ -131,7 +131,7 @@ test.describe('User registration', () => {
     await registerPage.open();
     await registerPage.submit(user.nome, user.email, '');
 
-    await expect(page).toHaveURL(/cadastrarusuarios/);
+    await expect(page).toHaveURL(/\/cadastrarusuarios(?:$|[?#])/);
     await expectRequiredFieldError(page, 'Password');
   });
 
@@ -142,7 +142,7 @@ test.describe('User registration', () => {
     await registerPage.open();
     await registerPage.submit(user.nome, 'invalid-email', user.password);
 
-    await expect(page).toHaveURL(/cadastrarusuarios/);
+    await expect(page).toHaveURL(/\/cadastrarusuarios(?:$|[?#])/);
     const emailInput = page.getByTestId('email');
     await expect(emailInput).toHaveValue('invalid-email');
     expect(await emailInput.evaluate((input: HTMLInputElement) => input.validity.typeMismatch)).toBe(true);
@@ -154,7 +154,7 @@ test.describe('User registration', () => {
     await registerPage.open();
     await registerPage.register(user);
 
-    await expect(page).toHaveURL(/cadastrarusuarios/);
+    await expect(page).toHaveURL(/\/cadastrarusuarios(?:$|[?#])/);
     await expect(page.getByText('Este email já está sendo usado')).toBeVisible();
   });
 
@@ -187,7 +187,7 @@ test.describe('User registration', () => {
     await registerPage.open();
     await registerPage.goToLogin();
 
-    await expect(page).toHaveURL(/login/);
+    await expect(page).toHaveURL(/\/login(?:$|[?#])/);
   });
 
   test('submits the form with the Enter key', async ({ page }) => {
@@ -197,7 +197,7 @@ test.describe('User registration', () => {
     await registerPage.open();
     await registerPage.submitWithEnter(user.nome, user.email, user.password);
 
-    await expect(page).toHaveURL(/home/);
+    await expect(page).toHaveURL(/\/home(?:$|[?#])/);
   });
 
   test('masks the password field', async ({ page }) => {

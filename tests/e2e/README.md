@@ -40,10 +40,12 @@ The current public ServeRest frontend allows a normal user to open both administ
 ## Assertions and Stability
 
 - Prefer Playwright web-first assertions such as `toHaveURL`, `toBeVisible`, and `toHaveValue`.
+- Match complete routes, including a path boundary, so assertions cannot pass on a different route with a matching substring.
 - Avoid `waitForTimeout`; wait for an observable state instead.
 - Assert the business result, not only that a click completed.
 - Keep negative scenarios explicit about the invalid field or combination.
 - If a test depends on the external API, check whether the failure happened during data setup or in the UI flow.
+- Keep one worker while tests share the public ServeRest environment. CI retries once for diagnostics, but fails the run if a retry was needed; retries can create additional temporary users before the nightly reset.
 
 ## Accessibility Scenarios
 

@@ -65,7 +65,7 @@ export class RegisterPage {
 
   /** Confirms that the registration route is still open. */
   async expectLoaded(): Promise<void> {
-    await expect(this.page).toHaveURL(/cadastrarusuarios/);
+    await expect(this.page).toHaveURL(/\/cadastrarusuarios(?:$|[?#])/);
   }
 
   /** Activates the existing navigation control to the login screen. */
