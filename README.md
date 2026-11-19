@@ -9,6 +9,7 @@ O objetivo principal é validar cenários reais como login, cadastro, navegaçã
 - testes de login
 - testes de cadastro de usuário
 - testes de cadastro de usuários pela área administrativa, incluindo a confirmação do perfil na listagem
+- validação dos campos obrigatórios no cadastro de produtos
 - acesso à home após autenticação
 - testes de API
 - testes de acessibilidade com Axe e navegação por teclado
@@ -121,10 +122,16 @@ npm run test:e2e
 npm run test:login
 ```
 
-### Executar testes de cadastro
+### Executar testes de cadastro de usuários
 
 ```powershell
-npm run test:register
+npm run test:register:user
+```
+
+### Validar campos obrigatórios no cadastro de produtos
+
+```powershell
+npm run test:register:product
 ```
 
 ### Executar testes de acessibilidade
