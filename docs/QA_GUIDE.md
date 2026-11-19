@@ -12,6 +12,7 @@ Os cenários atuais cobrem:
 - erros de login e validação de campos obrigatórios
 - cadastro de usuários
 - cadastro de usuários pela área administrativa, com validação dos dados e do perfil na lista
+- validação dos campos obrigatórios no cadastro de produtos, usando um administrador criado para cada teste
 - tratamento de e-mail duplicado
 - validação explícita de campos obrigatórios e proteção das rotas administrativas
 - navegação de login para cadastro e vice-versa
@@ -92,6 +93,10 @@ test('exemplo', async ({ user }) => {
 
 Os testes de cadastro pela área administrativa também usam um administrador criado para o próprio teste. Após cadastrar, validam a linha correspondente em `/admin/listarusuarios`, incluindo a coluna `Administrador` (`true` ou `false`), sem depender de contas que permaneçam no ambiente externo.
 
+Os testes dos campos obrigatórios de produtos também criam um administrador temporário via API para autenticação, mas enviam formulários inválidos e não criam produtos. Os usuários de teste permanecem no ambiente até o reset noturno.
+
+Nos cenários que deixam apenas um campo vazio, os demais valores são preenchidos e somente o alerta do campo ausente é esperado. Alertas adicionais são tratados como defeito, não ignorados.
+
 Os testes também verificam mensagens de validação, formato de e-mail e acesso às rotas administrativas sem sessão ou com usuário normal. No momento, o frontend público permite que um usuário normal acesse diretamente o cadastro e a listagem administrativa; os cenários correspondentes ficam falhando intencionalmente para evidenciar esse problema até que o serviço seja corrigido. Os testes não tentam cadastrar administradores por esse caminho.
 
 Quando o cenário exige um usuário administrador, use:
@@ -112,6 +117,7 @@ Objetos atuais:
 - `HomePage`: valida que a autenticação levou para a home
 - `AdminRegisterPage`: envia cadastros pela área administrativa
 - `UsersListPage`: valida nome, e-mail, senha e perfil do usuário cadastrado na listagem
+- `ProductRegisterPage`: valida os campos obrigatórios do cadastro de produtos
 
 Preferência de seletor:
 
@@ -143,7 +149,13 @@ npm run test:login
 Executar testes de cadastro:
 
 ```powershell
-npm run test:register
+npm run test:register:user
+```
+
+Validar os campos obrigatórios no cadastro de produtos:
+
+```powershell
+npm run test:register:product
 ```
 
 Executar testes de acessibilidade:

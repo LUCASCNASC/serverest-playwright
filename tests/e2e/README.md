@@ -2,7 +2,7 @@
 
 # E2E Tests
 
-Organize browser scenarios by feature. Use Page Objects from `src/pages` and create test data dynamically through the API instead of relying on persistent users.
+Organize browser scenarios by feature, using resource-specific filenames such as `register-user.spec.ts` and `register-product.spec.ts`. Use Page Objects from `src/pages` and create test data dynamically through the API instead of relying on persistent users.
 
 ## Page Object Model
 
@@ -14,6 +14,7 @@ Current Page Objects:
 - `RegisterPage`: opens registration, submits normal or administrator users, and navigates to login.
 - `AdminRegisterPage`: submits users through the administrator area.
 - `UsersListPage`: checks that an administrator-created user appears with the submitted name, e-mail, password, and role.
+- `ProductRegisterPage`: submits product registration form values and validates mandatory-field errors.
 - `HomePage`: opens the administrator user-registration screen from the home card.
 
 When adding a screen:
@@ -30,6 +31,8 @@ Use `createUserData()` for registration scenarios. Use the `user` fixture when a
 
 Do not share credentials between tests. Each test should create or receive its own data so execution order and parallel workers do not affect the result.
 Admin-area registration tests use a newly created administrator fixture and dynamically generated users; they verify successful registrations in the users list, including the `Administrador` value. These tests write temporary data to the external ServeRest environment, which is reset nightly.
+Product required-field tests also create a fresh administrator for login, but submit only invalid forms; they do not create product records.
+When testing one missing field, the other values are valid and only that field's required alert is expected. Unexpected validation alerts therefore fail the scenario instead of being ignored.
 
 ## Registration validation and authorization
 

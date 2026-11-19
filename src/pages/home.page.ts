@@ -13,4 +13,9 @@ export class HomePage {
   async openUserRegistration(): Promise<void> {
     await this.page.getByTestId('cadastrarUsuarios').click();
   }
+
+  /** Opens product registration from the administrator header. */
+  async openProductRegistration(): Promise<void> {
+    await this.page.getByTestId('cadastrar-produtos').click();
+  }
 };
