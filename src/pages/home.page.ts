@@ -18,4 +18,9 @@ export class HomePage {
   async openProductRegistration(): Promise<void> {
     await this.page.getByTestId('cadastrar-produtos').click();
   }
+
+  /** Opens product registration from the administrator home card. */
+  async openProductRegistrationFromCard(): Promise<void> {
+    await this.page.getByTestId('cadastrarProdutos').click();
+  }
 };

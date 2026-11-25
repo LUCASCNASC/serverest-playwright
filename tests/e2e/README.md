@@ -15,7 +15,8 @@ Current Page Objects:
 - `AdminRegisterPage`: submits users through the administrator area.
 - `UsersListPage`: checks that an administrator-created user appears with the submitted name, e-mail, password, and role.
 - `ProductRegisterPage`: submits product registration form values and validates mandatory-field errors.
-- `HomePage`: opens the administrator user-registration screen from the home card.
+- `ProductsListPage`: verifies a product's details in the administrator list.
+- `HomePage`: opens administrator registration screens from the home page.
 
 When adding a screen:
 
@@ -31,14 +32,17 @@ Use `createUserData()` for registration scenarios. Use the `user` fixture when a
 
 Do not share credentials between tests. Each test should create or receive its own data so execution order and parallel workers do not affect the result.
 Admin-area registration tests use a newly created administrator fixture and dynamically generated users; they verify successful registrations in the users list, including the `Administrador` value. These tests write temporary data to the external ServeRest environment, which is reset nightly.
-Product required-field tests also create a fresh administrator for login, but submit only invalid forms; they do not create product records.
+Product tests create a fresh administrator and unique product data. Successful scenarios create products that remain in the external environment until the nightly reset.
 When testing one missing field, the other values are valid and only that field's required alert is expected. Unexpected validation alerts therefore fail the scenario instead of being ignored.
+The image scenario checks the displayed filename after reloading the list, not the stored file contents. Product name uniqueness and numeric limits follow the public ServeRest OpenAPI contract.
 
 ## Registration validation and authorization
 
 Required-field scenarios assert the corresponding visible validation messages, and malformed e-mails are checked against the browser's native email constraint. Administrator registration and list routes are also tested with no session and with a normal user.
 
-The current public ServeRest frontend allows a normal user to open both administrator routes directly. The normal-user authorization tests intentionally fail while that behavior remains, so the gap stays visible in test runs rather than being hidden as an expected failure. Do not try to create an administrator through this unauthorized path in tests.
+The public ServeRest frontend allows a normal user to open the administrator registration and users list routes. The two authorization scenarios are marked with `test.fail()` after login and navigation. Do not try to create an administrator through this unauthorized path in tests.
+
+On 24/11/2026, product tests also exposed the registration form to a normal user and failed to complete registration after correcting a missing name. Both scenarios are marked with `test.fail()` after their setup; the authorization test does not submit a product as a normal user. Expected failures do not fix the defects or fail the run. Remove the annotations when the application is corrected; Playwright reports an unexpected pass if the marked scenario succeeds.
 
 ## Assertions and Stability
 

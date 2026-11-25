@@ -1,14 +1,17 @@
 import { expect, test } from '../../src/fixtures/test.js';
 import { createProductData } from '../../src/data/product.factory.js';
+import { environment } from '../../src/config/env.js';
 import { HomePage } from '../../src/pages/home.page.js';
 import { LoginPage } from '../../src/pages/login.page.js';
+import { ProductsListPage } from '../../src/pages/products-list.page.js';
+import type { APIRequestContext, Page } from '@playwright/test';
 import {
   ProductRegisterPage,
   type ProductRequiredField,
 } from '../../src/pages/product-register.page.js';
 
 async function openProductRegistration(
-  page: import('@playwright/test').Page,
+  page: Page,
   admin: { email: string; password: string },
 ): Promise<ProductRegisterPage> {
   const loginPage = new LoginPage(page);
@@ -22,6 +25,19 @@ async function openProductRegistration(
   await productRegisterPage.expectLoaded();
 
   return productRegisterPage;
+}
+
+async function expectProductCount(request: APIRequestContext, name: string, count: number): Promise<void> {
+  const response = await request.get(`${environment.apiBaseUrl}/produtos`, {
+    params: { nome: name },
+  });
+  expect(response.ok(), `Product lookup failed with HTTP ${response.status()}`).toBe(true);
+  const result = await response.json();
+  expect(result.quantidade).toBe(count);
+  expect(result.produtos).toHaveLength(count);
+  for (const product of result.produtos) {
+    expect(product.nome).toBe(name);
+  }
 }
 
 test.describe('Product registration required fields', () => {
@@ -55,4 +71,209 @@ test.describe('Product registration required fields', () => {
       await expect(page).toHaveURL(/\/admin\/cadastrarprodutos(?:$|[?#])/);
     });
   }
+});
+
+test.describe('Product registration', () => {
+  test.use({ userRole: 'admin' });
+
+  test('registers a product without an image and verifies its details', async ({ page, user }) => {
+    const registerPage = await openProductRegistration(page, user);
+    const product = createProductData();
+
+    await registerPage.submit(product);
+
+    await expect(page).toHaveURL(/\/admin\/listarprodutos(?:$|[?#])/);
+    await new ProductsListPage(page).expectProductListed(product);
+  });
+
+  test('registers a product with an image and retains its filename after reload', async ({ page, user }) => {
+    const registerPage = await openProductRegistration(page, user);
+    const product = createProductData();
+    const imageName = 'product.png';
+
+    await registerPage.fill(product);
+    await page.getByLabel('Imagem: *').setInputFiles({
+      name: imageName,
+      mimeType: 'image/png',
+      buffer: Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/lZ8AAAAASUVORK5CYII=',
+        'base64',
+      ),
+    });
+    await page.getByRole('button', { name: 'Cadastrar', exact: true }).click();
+
+    await expect(page).toHaveURL(/\/admin\/listarprodutos(?:$|[?#])/);
+    const productsListPage = new ProductsListPage(page);
+    await productsListPage.expectProductListed(product, imageName);
+    await page.reload();
+    await productsListPage.expectProductListed(product, imageName);
+  });
+
+  test('registers the minimum price and zero quantity', async ({ page, user }) => {
+    const registerPage = await openProductRegistration(page, user);
+    const product = { ...createProductData(), preco: 1, quantidade: 0 };
+
+    await registerPage.submit(product);
+
+    await expect(page).toHaveURL(/\/admin\/listarprodutos(?:$|[?#])/);
+    await new ProductsListPage(page).expectProductListed(product);
+  });
+
+  test('preserves accented characters in the product name and description', async ({ page, user }) => {
+    const registerPage = await openProductRegistration(page, user);
+    const product = createProductData();
+    product.nome = `Café – ${product.nome}`;
+    product.descricao = `Descrição com acentos: ${product.descricao}`;
+
+    await registerPage.submit(product);
+
+    await expect(page).toHaveURL(/\/admin\/listarprodutos(?:$|[?#])/);
+    await new ProductsListPage(page).expectProductListed(product);
+  });
+
+  test('opens product registration from the administrator home card', async ({ page, user }) => {
+    const loginPage = new LoginPage(page);
+    const homePage = new HomePage(page);
+    await loginPage.open();
+    await loginPage.login(user.email, user.password);
+    await homePage.expectLoaded();
+
+    await homePage.openProductRegistrationFromCard();
+
+    await expect(page).toHaveURL(/\/admin\/cadastrarprodutos(?:$|[?#])/);
+    await new ProductRegisterPage(page).expectLoaded();
+  });
+
+  test('rejects a duplicate name and preserves entered values', async ({ page, user, request }) => {
+    const registerPage = await openProductRegistration(page, user);
+    const product = createProductData();
+    await registerPage.submit(product);
+    await new ProductsListPage(page).expectProductListed(product);
+    await new HomePage(page).openProductRegistration();
+
+    await registerPage.submit(product);
+
+    await expect(page).toHaveURL(/\/admin\/cadastrarprodutos(?:$|[?#])/);
+    await expect(page.getByRole('alert')).toContainText('Já existe produto com esse nome');
+    await expect(page.getByRole('textbox', { name: 'Nome: *' })).toHaveValue(product.nome);
+    await expect(page.getByRole('spinbutton', { name: 'Preço: *' })).toHaveValue(String(product.preco));
+    await expect(page.getByRole('textbox', { name: 'Descrição: *' })).toHaveValue(product.descricao);
+    await expect(page.getByRole('spinbutton', { name: 'Quantidade: *' })).toHaveValue(String(product.quantidade));
+    await expectProductCount(request, product.nome, 1);
+  });
+
+  test('allows correcting a required field and registering the product', async ({ page, user }) => {
+    const registerPage = await openProductRegistration(page, user);
+    const product = createProductData();
+
+    await registerPage.submit(product, ['Nome']);
+    await registerPage.expectRequiredFieldErrors(['Nome']);
+    await expect(page.getByRole('spinbutton', { name: 'Preço: *' })).toHaveValue(String(product.preco));
+    await expect(page.getByRole('textbox', { name: 'Descrição: *' })).toHaveValue(product.descricao);
+    await expect(page.getByRole('spinbutton', { name: 'Quantidade: *' })).toHaveValue(String(product.quantidade));
+    await page.getByRole('textbox', { name: 'Nome: *' }).fill(product.nome);
+    await page.getByRole('button', { name: 'Cadastrar', exact: true }).click();
+
+    test.fail(true, 'The external frontend drops the other field values when resubmitting after a validation error.');
+    await new ProductsListPage(page).expectProductListed(product);
+  });
+
+  for (const invalid of [
+    { field: 'preco', value: 0, message: 'Preco deve ser um número positivo' },
+    { field: 'preco', value: -1, message: 'Preco deve ser um número positivo' },
+    { field: 'quantidade', value: -1, message: 'Quantidade deve ser maior ou igual a 0' },
+  ] as const) {
+    test(`rejects ${invalid.field} ${invalid.value} without registering a product`, async ({ page, user, request }) => {
+      const registerPage = await openProductRegistration(page, user);
+      const product = { ...createProductData(), [invalid.field]: invalid.value };
+
+      await registerPage.submit(product);
+
+      await expect(page).toHaveURL(/\/admin\/cadastrarprodutos(?:$|[?#])/);
+      await expect(page.getByRole('alert')).toContainText(invalid.message);
+      await expectProductCount(request, product.nome, 0);
+    });
+  }
+
+  for (const field of ['Preço', 'Quantidade'] as const) {
+    test(`does not register a product with a decimal ${field.toLowerCase()}`, async ({ page, user, request }) => {
+      const registerPage = await openProductRegistration(page, user);
+      const product = createProductData();
+      await registerPage.fill(product);
+      const input = page.getByRole('spinbutton', { name: `${field}: *` });
+      await input.fill('1.5');
+
+      await page.getByRole('button', { name: 'Cadastrar', exact: true }).click();
+
+      await expect(page).toHaveURL(/\/admin\/cadastrarprodutos(?:$|[?#])/);
+      expect(await input.evaluate((element: HTMLInputElement) => element.validity.stepMismatch)).toBe(true);
+      await expectProductCount(request, product.nome, 0);
+    });
+  }
+
+  test('submits the product using Enter', async ({ page, user }) => {
+    const registerPage = await openProductRegistration(page, user);
+    const product = createProductData();
+    await registerPage.fill(product);
+
+    await page.getByRole('spinbutton', { name: 'Quantidade: *' }).press('Enter');
+
+    await expect(page).toHaveURL(/\/admin\/listarprodutos(?:$|[?#])/);
+    await new ProductsListPage(page).expectProductListed(product);
+  });
+
+  test('does not create duplicate products on a double click', async ({ page, user, request }) => {
+    const registerPage = await openProductRegistration(page, user);
+    const product = createProductData();
+    await registerPage.fill(product);
+
+    await page.getByRole('button', { name: 'Cadastrar', exact: true }).dblclick();
+
+    await expect(page).toHaveURL(/\/admin\/listarprodutos(?:$|[?#])/);
+    await new ProductsListPage(page).expectProductListed(product);
+    await expectProductCount(request, product.nome, 1);
+  });
+
+  test('exposes labeled product controls in keyboard order', async ({ page, user }) => {
+    await openProductRegistration(page, user);
+    const controls = [
+      page.getByRole('textbox', { name: 'Nome: *' }),
+      page.getByRole('spinbutton', { name: 'Preço: *' }),
+      page.getByRole('textbox', { name: 'Descrição: *' }),
+      page.getByRole('spinbutton', { name: 'Quantidade: *' }),
+      page.getByLabel('Imagem: *'),
+      page.getByRole('button', { name: 'Cadastrar', exact: true }),
+    ];
+
+    await controls[0].focus();
+    await expect(controls[0]).toBeFocused();
+    for (const control of controls.slice(1)) {
+      await page.keyboard.press('Tab');
+      await expect(control).toBeFocused();
+    }
+  });
+});
+
+test.describe('Product registration access control', () => {
+  test('redirects an unauthenticated visit to login', async ({ page }) => {
+    await page.goto('/admin/cadastrarprodutos');
+
+    await expect(page).toHaveURL(/\/login(?:$|[?#])/);
+    await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Cadastro de Produtos' })).toHaveCount(0);
+  });
+
+  test('does not expose product registration to a normal user', async ({ page, user }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.open();
+    await loginPage.login(user.email, user.password);
+    await new HomePage(page).expectLoaded();
+
+    await page.goto('/admin/cadastrarprodutos');
+
+    test.fail(true, 'The external frontend exposes the product registration page to normal users.');
+    await expect.soft(page).not.toHaveURL(/\/admin\/cadastrarprodutos(?:$|[?#])/);
+    await expect.soft(page.getByRole('heading', { name: 'Cadastro de Produtos' })).toHaveCount(0);
+    await expect.soft(page.getByRole('button', { name: 'Cadastrar', exact: true })).toHaveCount(0);
+  });
 });
