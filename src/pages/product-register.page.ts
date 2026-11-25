@@ -36,12 +36,17 @@ export class ProductRegisterPage {
     await expect(this.quantityInput).toBeVisible();
   }
 
-  /** Submits the form with the provided values; empty strings exercise validation. */
-  async submit(product: ProductData, omittedFields: ProductRequiredField[] = []): Promise<void> {
+  /** Fills the form, optionally leaving fields empty to exercise validation. */
+  async fill(product: ProductData, omittedFields: ProductRequiredField[] = []): Promise<void> {
     await this.nameInput.fill(omittedFields.includes('Nome') ? '' : product.nome);
     await this.priceInput.fill(omittedFields.includes('Preço') ? '' : String(product.preco));
     await this.descriptionInput.fill(omittedFields.includes('Descrição') ? '' : product.descricao);
     await this.quantityInput.fill(omittedFields.includes('Quantidade') ? '' : String(product.quantidade));
+  }
+
+  /** Submits the form with the provided values. */
+  async submit(product: ProductData, omittedFields: ProductRequiredField[] = []): Promise<void> {
+    await this.fill(product, omittedFields);
     await this.registerButton.click();
   }
 
