@@ -1,6 +1,6 @@
 # ServeRest Playwright
 
-Este projeto automatiza testes de interface e API do sistema ServeRest usando Playwright + TypeScript.
+Este projeto automatiza testes de interface do ServeRest usando Playwright + TypeScript, com clientes de API para preparar e verificar dados.
 
 O objetivo principal é validar cenários reais como login, cadastro, navegação e acessibilidade, sem depender de usuários fixos ou dados manuais.
 
@@ -11,13 +11,13 @@ O objetivo principal é validar cenários reais como login, cadastro, navegaçã
 - testes de cadastro de usuários pela área administrativa, incluindo a confirmação do perfil na listagem
 - validação dos campos obrigatórios no cadastro de produtos
 - acesso à home após autenticação
-- testes de API
+- clientes de API para suporte aos testes E2E; a suíte independente de API ainda não foi implementada
 - testes de acessibilidade com Axe e navegação por teclado
 - relatórios e evidências de falha
 
 ## Requisitos
 
-- Node.js LTS
+- Node.js 22.20.0 (mesma versão usada na CI)
 - npm
 - navegador Chromium instalado pelo Playwright
 - acesso à internet para as URLs do frontend e da API
@@ -77,7 +77,7 @@ serverest-playwright/
 │   ├── fixtures/              # fixtures compartilhadas do Playwright
 │   └── pages/                 # Page Objects da interface
 ├── tests/
-│   ├── api/                   # testes de API
+│   ├── api/                   # reservado para futuros testes de API
 │   └── e2e/                   # testes de interface
 ├── .env                       # ambiente local (não versionado)
 ├── commands.md                # referência rápida de comandos
@@ -95,6 +95,7 @@ serverest-playwright/
 Os testes não usam usuários fixos gravados no sistema.
 
 O fixture `user` cria um usuário novo antes do teste, com papel de `normal` ou `admin`. Isso elimina dependência de dados que são apagados diariamente pelo ambiente externo.
+Ao final, a fixture tenta excluir apenas o usuário que criou. Usuários criados pela interface e produtos ainda permanecem até o reset noturno; interrupções abruptas também podem impedir a limpeza.
 
 Essa estratégia deixa os testes:
 
@@ -140,11 +141,17 @@ npm run test:register:product
 npm run test:a11y
 ```
 
-### Executar testes de API
+### Testar scripts de suporte
 
 ```powershell
-npm run test:api
+npm run test:scripts
 ```
+
+Ainda não há testes independentes em `tests/api`.
+
+### Atualizar o inventário HTML
+
+Edite `docs/INVENTARIO_CENARIOS.md`, depois execute `npm run inventory`. Use `npm run inventory:check` para verificar a sincronização.
 
 ### Rodar com navegador visível
 

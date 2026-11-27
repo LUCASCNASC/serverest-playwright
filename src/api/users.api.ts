@@ -23,4 +23,11 @@ export class UsersApi {
 
     return body._id;
   }
+
+  async delete(id: string): Promise<void> {
+    const response = await this.request.delete(`/usuarios/${encodeURIComponent(id)}`, { timeout: 10_000 });
+    if (!response.ok()) {
+      throw new Error(`Failed to delete test user ${id}: ${response.status()} ${await response.text()}`);
+    }
+  }
 };

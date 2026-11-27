@@ -7,16 +7,18 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:chromium": "playwright test --project=chromium",
-    "test:api": "playwright test tests/api",
     "test:e2e": "playwright test tests/e2e",
     "test:a11y": "playwright test tests/e2e/accessibility.spec.ts",
     "test:login": "playwright test tests/e2e/login.spec.ts",
-    "test:register:user": "playwright test tests/e2e/register-user.spec.ts",
-    "test:register:product": "playwright test tests/e2e/register-product.spec.ts",
+    "test:register:user": "playwright test tests/e2e/register-user",
+    "test:register:product": "playwright test tests/e2e/register-product",
     "audit": "npm audit --audit-level=high",
     "lint": "eslint .",
     "report": "playwright show-report",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:scripts": "node --test scripts/*.test.mjs",
+    "inventory": "node scripts/generate-inventory.mjs",
+    "inventory:check": "node scripts/generate-inventory.mjs --check"
   },
   "keywords": [],
   "author": "",
@@ -31,10 +33,14 @@
     "@types/node": "^26.5.0",
     "eslint": "^9.39.5",
     "eslint-plugin-playwright": "^2.12.0",
+    "markdown-it": "^15.0.3",
     "typescript": "^7.0.2"
   },
   "dependencies": {
     "@faker-js/faker": "^10.6.0",
     "dotenv": "^17.4.2"
+  },
+  "engines": {
+    "node": ">=22.20.0 <23"
   }
 }

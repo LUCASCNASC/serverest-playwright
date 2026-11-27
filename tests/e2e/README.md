@@ -2,7 +2,7 @@
 
 # E2E Tests
 
-Organize browser scenarios by feature, using resource-specific filenames such as `register-user.spec.ts` and `register-product.spec.ts`. Use Page Objects from `src/pages` and create test data dynamically through the API instead of relying on persistent users.
+Organize browser scenarios by feature and flow, using filenames such as `register-user.spec.ts`, `register-user-admin.spec.ts`, and `register-user-access.spec.ts`. Use Page Objects from `src/pages` and create test data dynamically through the API instead of relying on persistent users.
 
 ## Page Object Model
 
@@ -31,7 +31,7 @@ When adding a screen:
 Use `createUserData()` for registration scenarios. Use the `user` fixture when a test needs a user that already exists, such as login or duplicate e-mail validation.
 
 Do not share credentials between tests. Each test should create or receive its own data so execution order and parallel workers do not affect the result.
-Admin-area registration tests use a newly created administrator fixture and dynamically generated users; they verify successful registrations in the users list, including the `Administrador` value. These tests write temporary data to the external ServeRest environment, which is reset nightly.
+Admin-area registration tests use a newly created administrator fixture and dynamically generated users; they verify successful registrations in the users list, including the `Administrador` value. The fixture deletes only its own user by ID after each test. Users created through the UI and products remain until the nightly reset; abrupt interruption can prevent fixture cleanup.
 Product tests create a fresh administrator and unique product data. Successful scenarios create products that remain in the external environment until the nightly reset.
 When testing one missing field, the other values are valid and only that field's required alert is expected. Unexpected validation alerts therefore fail the scenario instead of being ignored.
 The image scenario checks the displayed filename after reloading the list, not the stored file contents. Product name uniqueness and numeric limits follow the public ServeRest OpenAPI contract.

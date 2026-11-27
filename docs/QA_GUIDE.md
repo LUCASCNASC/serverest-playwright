@@ -4,7 +4,7 @@ Este guia explica de forma simples como instalar, executar, manter e diagnostica
 
 ## Objetivo do projeto
 
-Este repositório contém testes com Playwright para a interface web e a API do ServeRest.
+Este repositório contém testes com Playwright para a interface web e clientes de API para suporte. A suíte independente de API ainda não foi implementada.
 
 Os cenários atuais cobrem:
 
@@ -21,7 +21,7 @@ Os cenários atuais cobrem:
 
 ## Pré-requisitos
 
-- Node.js LTS
+- Node.js 22.20.0, também usado na CI
 - npm
 - acesso ao frontend e à API do ServeRest
 - navegador Chromium instalado via Playwright
@@ -61,7 +61,7 @@ src/
 
 tests/
   e2e/         testes de interface por funcionalidade
-  api/         testes de API por recurso
+  api/         reservado para futuros testes de API
 
 .github/      workflow de CI
 scripts/       utilitários de suporte
@@ -79,7 +79,7 @@ O fixture `user` faz isso automaticamente:
 2. define o perfil como `normal` ou `admin`
 3. cria o registro via `POST /usuarios`
 4. entrega as credenciais para o teste
-5. fecha o contexto da API ao final
+5. tenta excluir somente o usuário criado pela fixture e fecha o contexto da API ao final
 
 Exemplo:
 
@@ -93,7 +93,7 @@ test('exemplo', async ({ user }) => {
 
 Os testes de cadastro pela área administrativa também usam um administrador criado para o próprio teste. Após cadastrar, validam a linha correspondente em `/admin/listarusuarios`, incluindo a coluna `Administrador` (`true` ou `false`), sem depender de contas que permaneçam no ambiente externo.
 
-Os testes de produtos criam um administrador temporário via API e dados únicos para cada cenário. Os cenários de sucesso criam produtos no ambiente externo. Usuários e produtos de teste permanecem no ambiente até o reset noturno.
+Os testes de produtos criam um administrador temporário via API e dados únicos para cada cenário. A fixture remove seu próprio usuário por ID ao final, inclusive após falhas, e sinaliza falhas de exclusão. Usuários criados pela interface e produtos permanecem no ambiente até o reset noturno. Interrupções abruptas podem impedir a limpeza.
 
 Nos cenários que deixam apenas um campo vazio, os demais valores são preenchidos e somente o alerta do campo ausente é esperado. Alertas adicionais são tratados como defeito, não ignorados.
 
@@ -169,10 +169,19 @@ Executar testes de acessibilidade:
 npm run test:a11y
 ```
 
-Executar testes de API:
+Testar scripts de suporte:
 
 ```powershell
-npm run test:api
+npm run test:scripts
+```
+
+Não há testes independentes de API em `tests/api`.
+
+Gerar o inventário HTML a partir do Markdown e verificar sua sincronização:
+
+```powershell
+npm run inventory
+npm run inventory:check
 ```
 
 Executar com navegador visível:
