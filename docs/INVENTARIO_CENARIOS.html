@@ -6,381 +6,470 @@
   <meta name="color-scheme" content="light">
   <title>Inventário de cenários | ServeRest Playwright</title>
   <style>
-    :root {
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-      color: #17243b;
-      background: #f3f6fb;
-      line-height: 1.65;
-      scroll-behavior: smooth;
-    }
+    :root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #17243b; background: #f3f6fb; line-height: 1.65; scroll-behavior: smooth; }
     * { box-sizing: border-box; }
     body { margin: 0; }
     a { color: #1259a6; text-underline-offset: 3px; overflow-wrap: anywhere; }
-    a:hover { color: #073a73; }
     a:focus-visible, summary:focus-visible { outline: 3px solid #ec8c20; outline-offset: 3px; }
-    code { font-family: Consolas, "Courier New", monospace; font-size: .9em; overflow-wrap: anywhere; }
-    header { background: #10233f; color: #fff; padding: 3.5rem 1.5rem 5.2rem; }
-    .wrap { max-width: 1180px; margin: auto; }
-    .eyebrow { color: #98e3d8; font-size: .8rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
-    h1 { font-size: clamp(2.1rem, 5vw, 3.6rem); line-height: 1.1; max-width: 850px; margin: .55rem 0 1rem; letter-spacing: -.035em; }
-    header p { color: #d3deec; max-width: 720px; margin: .5rem 0; }
+    code { font-family: Consolas, monospace; font-size: .9em; overflow-wrap: anywhere; }
+    header { background: #10233f; color: #fff; padding: 3rem 1.5rem; }
+    header p { color: #d3deec; margin-bottom: 0; }
     header a { color: #b7eee8; }
-    main { padding: 0 1.5rem 3rem; }
-    .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: -3rem; }
-    .metric, .panel, details { background: #fff; border: 1px solid #dfe7f1; border-radius: 14px; box-shadow: 0 8px 24px #17243b0b; }
-    .metric { padding: 1.2rem 1.3rem; }
-    .metric strong { display: block; color: #142a4a; font-size: 2rem; line-height: 1.2; }
-    .metric span { color: #52647a; font-size: .9rem; }
-    .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 1.5rem; align-items: start; margin-top: 1.5rem; }
-    nav { position: sticky; top: 1rem; padding: 1.25rem; }
-    nav strong { display: block; margin-bottom: .65rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: #52647a; }
-    nav a { display: block; padding: .35rem 0; font-size: .92rem; text-decoration: none; }
-    article > section { margin-bottom: 1.3rem; scroll-margin-top: 1rem; }
-    .panel { padding: clamp(1.2rem, 3vw, 2rem); }
-    h2 { margin: 0 0 .7rem; font-size: 1.55rem; line-height: 1.25; letter-spacing: -.02em; }
-    h3 { margin: 1.5rem 0 .5rem; font-size: 1.1rem; }
-    p { margin: .6rem 0 1rem; }
-    p:last-child { margin-bottom: 0; }
-    .muted { color: #52647a; }
-    .notice { border-left: 4px solid #d37a13; background: #fff6e8; padding: 1rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
-    .notice.info { border-color: #198e85; background: #eaf8f6; }
+    h1 { font-size: clamp(2rem, 5vw, 3.3rem); line-height: 1.1; margin: 0; }
+    h2 { margin-top: 0; font-size: 1.5rem; }
+    h3 { font-size: 1.1rem; }
+    .wrap { max-width: 1180px; margin: auto; }
+    .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 1.5rem; align-items: start; padding: 1.5rem; }
+    nav { position: sticky; top: 1rem; }
+    nav strong { display: block; color: #52647a; font-size: .8rem; text-transform: uppercase; }
+    nav a { display: block; padding: .3rem 0; text-decoration: none; }
+    .panel, section { background: #fff; border: 1px solid #dfe7f1; border-radius: 14px; padding: 1.3rem; box-shadow: 0 8px 24px #17243b0b; }
+    section { margin-bottom: 1.2rem; scroll-margin-top: 1rem; }
+    details { border: 1px solid #dfe7f1; border-radius: 10px; margin: .8rem 0; }
+    summary { cursor: pointer; font-weight: 700; padding: 1rem; }
+    summary:hover { background: #f5fafb; }
+    .detail-body { padding: 0 1rem 1rem; border-top: 1px solid #e6ecf3; }
     .table-wrap { overflow-x: auto; }
     table { border-collapse: collapse; width: 100%; text-align: left; font-size: .93rem; }
-    th, td { padding: .75rem; border-bottom: 1px solid #e6ecf3; vertical-align: top; }
-    th { color: #52647a; font-size: .76rem; letter-spacing: .06em; text-transform: uppercase; }
-    tr:last-child td { border-bottom: 0; }
-    details { margin: .8rem 0; overflow: hidden; box-shadow: none; }
-    summary { display: flex; align-items: center; gap: .75rem; cursor: pointer; list-style: none; padding: 1rem 1.2rem; font-weight: 750; }
-    summary::-webkit-details-marker { display: none; }
-    summary::before { content: "+"; color: #116c71; font-size: 1.3rem; line-height: 1; }
-    details[open] summary::before { content: "−"; }
-    summary:hover { background: #f5fafb; }
-    .badge { margin-left: auto; flex-shrink: 0; padding: .15rem .6rem; border-radius: 999px; background: #e8f6f3; color: #17645c; font-size: .78rem; }
-    .expected { display: inline-block; padding: .05rem .45rem; border-radius: 999px; background: #fff0d6; color: #754306; font-size: .78rem; font-weight: 700; }
-    .detail-body { padding: 0 1.2rem 1.2rem; border-top: 1px solid #e6ecf3; }
-    .detail-body > p:first-child { margin-top: 1rem; }
-    li { padding: .15rem 0 .15rem .2rem; }
-    ul, ol { padding-left: 1.5rem; }
-    footer { color: #52647a; padding: 0 1.5rem 2rem; font-size: .88rem; }
-    @media (max-width: 800px) {
-      .dashboard { grid-template-columns: repeat(2, 1fr); }
-      .layout { grid-template-columns: 1fr; }
-      nav { position: static; }
-      nav a { display: inline-block; margin-right: 1rem; }
-    }
-    @media (max-width: 450px) {
-      header { padding-top: 2.5rem; }
-      main { padding-right: 1rem; padding-left: 1rem; }
-      .metric { padding: 1rem; }
-      summary { align-items: flex-start; }
-    }
-    @media print {
-      header { background: none; color: #17243b; padding: 0 0 1rem; }
-      header p, header a, .eyebrow { color: #17243b; }
-      main { padding: 0; }
-      .dashboard { margin-top: 0; }
-      .layout { display: block; }
-      nav { display: none; }
-      .panel, .metric, details { box-shadow: none; }
-      details { break-inside: avoid; }
-    }
+    th, td { padding: .7rem; border-bottom: 1px solid #e6ecf3; vertical-align: top; }
+    th { color: #52647a; }
+    li { padding: .15rem 0; }
+    footer { padding: 0 1.5rem 2rem; color: #52647a; font-size: .85rem; }
+    @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } nav { position: static; } nav a { display: inline-block; margin-right: 1rem; } }
+    @media print { header { color: #17243b; background: none; } header p, header a { color: #17243b; } nav { display: none; } .layout { display: block; } section { box-shadow: none; } }
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="eyebrow">Qualidade · Automação · Playwright</div>
-      <h1>Inventário de cenários</h1>
-      <p>Uma visão da estrutura do projeto ServeRest e dos testes automatizados disponíveis.</p>
-      <p>Referência: 24/11/2026 · <a href="INVENTARIO_CENARIOS.md">Consultar versão em Markdown</a></p>
-    </div>
-  </header>
-
-  <main class="wrap">
-    <div class="dashboard" aria-label="Resumo do inventário">
-      <div class="metric"><strong>81</strong><span>testes Playwright</span></div>
-      <div class="metric"><strong>5</strong><span>arquivos Playwright</span></div>
-      <div class="metric"><strong>7</strong><span>áreas Playwright</span></div>
-      <div class="metric"><strong>Chromium</strong><span>navegador configurado</span></div>
-    </div>
-    <div class="layout">
-      <nav class="panel" aria-label="Navegação do inventário">
-        <strong>Navegação</strong>
-        <a href="#resumo">Resumo</a>
-        <a href="#estrutura">Estrutura e dados</a>
-        <a href="#cenarios">Cenários implementados</a>
-        <a href="#suporte">Teste de suporte</a>
-        <a href="#execucao">Execução e CI</a>
-        <a href="#atencao">Pontos de atenção</a>
-      </nav>
-      <article>
-        <section id="resumo" class="panel">
-          <h2>Resumo</h2>
-          <p>O projeto automatiza a interface do ServeRest usando Playwright e TypeScript. A descoberta do runner identificou os seguintes testes. Há também <strong>1 teste de suporte</strong> para o resumo da pipeline, executado separadamente.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th scope="col">Área</th><th scope="col">Arquivo</th><th scope="col">Testes</th></tr></thead>
-              <tbody>
-                <tr><td>Login</td><td><a href="../tests/e2e/login.spec.ts">login.spec.ts</a></td><td>13</td></tr>
-                <tr><td>Home</td><td><a href="../tests/e2e/home.spec.ts">home.spec.ts</a></td><td>2</td></tr>
-                <tr><td>Usuários e acesso administrativo</td><td><a href="../tests/e2e/register-user.spec.ts">register-user.spec.ts</a></td><td>37</td></tr>
-                <tr><td>Cadastro de produtos</td><td><a href="../tests/e2e/register-product.spec.ts">register-product.spec.ts</a></td><td>22</td></tr>
-                <tr><td>Acessibilidade</td><td><a href="../tests/e2e/accessibility.spec.ts">accessibility.spec.ts</a></td><td>7</td></tr>
-                <tr><td><strong>Total</strong></td><td></td><td><strong>81</strong></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="notice"><strong>Implementado não significa aprovado.</strong> A última execução completa disponível começou em <strong>24/11/2026 às 10h10 (UTC−3)</strong>: 73 testes passaram e 8 apresentaram falhas esperadas. O Playwright considerou a execução bem-sucedida, mas os defeitos não foram corrigidos. A conferência atual listou os testes sem executá-los novamente.</div>
-          <h3>Resultado da última execução Playwright</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th scope="col">Área</th><th scope="col">Passaram</th><th scope="col">Falhas esperadas</th></tr></thead>
-              <tbody>
-                <tr><td>Login</td><td>13</td><td>0</td></tr>
-                <tr><td>Home</td><td>2</td><td>0</td></tr>
-                <tr><td>Cadastro público de usuários</td><td>17</td><td>0</td></tr>
-                <tr><td>Cadastro administrativo de usuários</td><td>17</td><td>0</td></tr>
-                <tr><td>Acesso administrativo de usuários</td><td>1</td><td>2</td></tr>
-                <tr><td>Cadastro de produtos</td><td>20</td><td>2</td></tr>
-                <tr><td>Acessibilidade</td><td>3</td><td>4</td></tr>
-                <tr><td><strong>Total</strong></td><td><strong>73</strong></td><td><strong>8</strong></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="estrutura" class="panel">
-          <h2>Estrutura e dados</h2>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th scope="col">Local</th><th scope="col">Responsabilidade</th></tr></thead>
-              <tbody>
-                <tr><td><a href="../tests/e2e">tests/e2e</a></td><td>Cenários de interface, navegação e acessibilidade por funcionalidade.</td></tr>
-                <tr><td><a href="../tests/api">tests/api</a></td><td>Pasta reservada para testes de API; contém apenas um README, sem testes executáveis.</td></tr>
-                <tr><td><a href="../src/pages">src/pages</a></td><td>Page Objects com seletores e ações das telas de login, home, usuários e produtos.</td></tr>
-                <tr><td><a href="../src/fixtures/test.ts">src/fixtures/test.ts</a></td><td>Fixture que cria um usuário normal ou administrador via API para o teste.</td></tr>
-                <tr><td><a href="../src/api/users.api.ts">src/api/users.api.ts</a></td><td>Cliente de <code>POST /usuarios</code> para preparação dos testes E2E; não é uma suíte de API.</td></tr>
-                <tr><td><a href="../src/data">src/data</a></td><td>Factories para usuários e produtos; e-mail e nome de produto usam UUID.</td></tr>
-                <tr><td><a href="../src/config/env.ts">src/config/env.ts</a></td><td>Configuração das URLs da aplicação e da API.</td></tr>
-                <tr><td><a href="../playwright.config.ts">playwright.config.ts</a></td><td>Navegador, workers, timeouts, retries e relatórios.</td></tr>
-                <tr><td><a href="../.github/workflows/playwright.yml">playwright.yml</a></td><td>Pipeline de verificação dos serviços e execução dos testes.</td></tr>
-                <tr><td><a href="../scripts/generate-github-summary.mjs">generate-github-summary.mjs</a></td><td>Resumo dos resultados no GitHub Actions.</td></tr>
-                <tr><td><a href="../scripts/generate-github-summary.test.mjs">generate-github-summary.test.mjs</a></td><td>Teste separado da classificação dos resultados no resumo.</td></tr>
-                <tr><td><a href="QA_GUIDE.md">QA_GUIDE.md</a></td><td>Guia de instalação, execução e manutenção dos testes.</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="notice info"><strong>Reset noturno:</strong> o ambiente externo apaga os dados à noite, inclusive usuários. Os testes usam dados gerados para cada execução, sem depender de contas ou produtos de dias anteriores. A fixture fecha o contexto de API, mas não exclui os usuários criados. Cenários de sucesso criam produtos; esses registros permanecem até o reset.</div>
-        </section>
-
-        <section id="cenarios" class="panel">
-          <h2>Cenários implementados</h2>
-          <p class="muted">Selecione uma área para expandir seus cenários, verificações e limitações.</p>
-
-          <details>
-            <summary>Login <span class="badge">13 testes</span></summary>
-            <div class="detail-body">
-              <p>Fonte: <a href="../tests/e2e/login.spec.ts">login.spec.ts</a></p>
-              <ol>
-                <li>Login de usuário normal e navegação para a home.</li>
-                <li>Login de administrador e navegação para a home.</li>
-                <li>E-mail e senha vazios, verificando os dois alertas.</li>
-                <li>E-mail vazio, verificando o alerta correspondente.</li>
-                <li>Senha vazia, verificando o alerta correspondente.</li>
-                <li>E-mail e senha inválidos.</li>
-                <li>E-mail inválido e senha de um usuário criado para o teste.</li>
-                <li>E-mail de um usuário criado para o teste e senha inválida.</li>
-                <li>Exibição da tela de login e dos controles esperados.</li>
-                <li>Tipos dos campos de e-mail e senha.</li>
-                <li>Formato de e-mail inválido.</li>
-                <li>Preservação dos valores após tentativa malsucedida.</li>
-                <li>Envio das credenciais com Enter.</li>
-              </ol>
-              <p class="muted"><strong>Limite:</strong> nos casos de credenciais ou formato inválidos, verifica-se principalmente a permanência na rota; nem todos validam mensagem específica.</p>
-            </div>
-          </details>
-
-          <details>
-            <summary>Home <span class="badge">2 testes</span></summary>
-            <div class="detail-body">
-              <p>Fonte: <a href="../tests/e2e/home.spec.ts">home.spec.ts</a></p>
-              <ol><li>Usuário normal alcança a home após login.</li><li>Administrador alcança a home após login.</li></ol>
-              <p class="muted">Validam a rota da home. Há testes de login semelhantes, contabilizados separadamente pelo runner.</p>
-            </div>
-          </details>
-
-          <details>
-            <summary>Cadastro público de usuários <span class="badge">17 testes</span></summary>
-            <div class="detail-body">
-              <p>Fonte: <a href="../tests/e2e/register-user.spec.ts">register-user.spec.ts</a></p>
-              <ol>
-                <li>Cadastro de usuário normal com redirecionamento para a home.</li>
-                <li>Login com usuário normal recém-cadastrado.</li>
-                <li>Cadastro de administrador com redirecionamento para a home.</li>
-                <li>Cadastro com nome acentuado e caracteres especiais, verificando navegação para a home.</li>
-                <li>Exibição da tela de cadastro e dos controles esperados.</li>
-                <li>Tipos e atributos <code>name</code> dos campos.</li>
-                <li>Todos os campos vazios, com os alertas de nome, e-mail e senha.</li>
-                <li>Nome vazio, com o alerta correspondente.</li>
-                <li>E-mail vazio, com o alerta correspondente.</li>
-                <li>Senha vazia, com o alerta correspondente.</li>
-                <li>Formato de e-mail inválido, verificando a validação nativa.</li>
-                <li>E-mail duplicado, verificando a mensagem apresentada.</li>
-                <li>Preservação dos valores após erro de e-mail duplicado.</li>
-                <li>Marcar e desmarcar a opção de administrador.</li>
-                <li>Navegação para a tela de login.</li>
-                <li>Envio do formulário com Enter.</li>
-                <li>Campo de senha com tipo <code>password</code>.</li>
-              </ol>
-              <p class="muted">O cenário de nome acentuado confirma o redirecionamento, mas não consulta a persistência exata do nome.</p>
-            </div>
-          </details>
-
-          <details>
-            <summary>Cadastro administrativo de usuários <span class="badge">17 testes</span></summary>
-            <div class="detail-body">
-              <p>Fonte: <a href="../tests/e2e/register-user.spec.ts">register-user.spec.ts</a></p>
-              <ol>
-                <li>Cadastrar usuário normal e verificar seus dados na listagem.</li>
-                <li>Cadastrar administrador e verificar seus dados e perfil na listagem.</li>
-                <li>Cadastrar nome acentuado e verificar sua preservação na listagem.</li>
-                <li>Fazer login com usuário normal recém-cadastrado.</li>
-                <li>Exibir os controles da tela administrativa de cadastro.</li>
-                <li>Verificar tipos e atributos <code>name</code> dos campos.</li>
-                <li>Todos os campos vazios, com os alertas de nome, e-mail e senha.</li>
-                <li>Nome vazio, com o alerta correspondente.</li>
-                <li>E-mail vazio, com o alerta correspondente.</li>
-                <li>Senha vazia, com o alerta correspondente.</li>
-                <li>Formato de e-mail inválido, verificando a validação nativa.</li>
-                <li>E-mail duplicado, verificando a mensagem apresentada.</li>
-                <li>Preservação dos valores após erro de e-mail duplicado, incluindo a opção de administrador.</li>
-                <li>Marcar e desmarcar a opção de administrador.</li>
-                <li>Navegar do cadastro administrativo para a lista de usuários.</li>
-                <li>Enviar o formulário com Enter e verificar o usuário na lista.</li>
-                <li>Campo de senha com tipo <code>password</code>.</li>
-              </ol>
-              <p class="muted">Nos cadastros validados na lista, <a href="../src/pages/users-list.page.ts">UsersListPage</a> verifica rota, cabeçalho e linha do e-mail, incluindo nome, e-mail, senha e perfil <code>true</code> ou <code>false</code>. A coluna Ações não é validada.</p>
-            </div>
-          </details>
-
-          <details>
-            <summary>Acesso administrativo de usuários <span class="badge">3 testes</span></summary>
-            <div class="detail-body">
-              <p>Fonte: <a href="../tests/e2e/register-user.spec.ts">register-user.spec.ts</a></p>
-              <ol>
-                <li>Sem autenticação, acessar diretamente cadastro e listagem administrativos e verificar redirecionamento para login.</li>
-                <li>Com usuário normal, verificar que o formulário administrativo não é exposto. <span class="expected">Falha esperada</span></li>
-                <li>Com usuário normal, verificar que a lista administrativa não é exposta. <span class="expected">Falha esperada</span></li>
-              </ol>
-              <div class="notice">As duas últimas expectativas estão marcadas com <code>test.fail()</code> após login e navegação: o frontend público permitiu esses acessos indevidos. As falhas esperadas não reprovam a execução nem corrigem os defeitos.</div>
-            </div>
-          </details>
-
-          <details>
-            <summary>Cadastro de produtos <span class="badge">22 testes</span></summary>
-            <div class="detail-body">
-              <p>Fonte: <a href="../tests/e2e/register-product.spec.ts">register-product.spec.ts</a>. Os cinco primeiros cenários autenticam um administrador criado para o teste e validam a permanência na rota.</p>
-              <ol>
-                <li>Todos os campos obrigatórios vazios: verificar os quatro alertas de nome, preço, descrição e quantidade.</li>
-                <li>Nome vazio e demais valores preenchidos: esperar somente o alerta de nome obrigatório.</li>
-                <li>Preço vazio e demais valores preenchidos: esperar somente o alerta de preço obrigatório.</li>
-                <li>Descrição vazia e demais valores preenchidos: esperar somente o alerta de descrição obrigatória.</li>
-                <li>Quantidade vazia e demais valores preenchidos: esperar somente o alerta de quantidade obrigatória.</li>
-                <li>Cadastro sem imagem e verificação dos dados na listagem.</li>
-                <li>Cadastro com imagem e verificação do nome do arquivo após atualizar a listagem.</li>
-                <li>Cadastro com preço mínimo de 1 e quantidade zero.</li>
-                <li>Preservação de acentos no nome e na descrição.</li>
-                <li>Navegação pelo cartão da home; os demais cenários administrativos usam o menu.</li>
-                <li>Nome duplicado: alerta, preservação dos valores e ausência de outro registro.</li>
-                <li>Correção do nome ausente e tentativa de concluir o cadastro. <span class="expected">Falha esperada</span></li>
-                <li>Rejeição de preço zero.</li>
-                <li>Rejeição de preço negativo.</li>
-                <li>Rejeição de quantidade negativa.</li>
-                <li>Rejeição de preço decimal pela validação nativa.</li>
-                <li>Rejeição de quantidade decimal pela validação nativa.</li>
-                <li>Envio do formulário com Enter.</li>
-                <li>Duplo clique no envio sem criação de produto duplicado.</li>
-                <li>Rótulos e ordem de navegação por teclado nos controles do formulário.</li>
-                <li>Acesso sem autenticação redirecionado para login.</li>
-                <li>Usuário normal não deve ter acesso ao formulário administrativo. <span class="expected">Falha esperada</span></li>
-              </ol>
-              <div class="notice">Na execução de 24/11/2026, 20 testes passaram e 2 falharam: após corrigir o nome, surgiram alertas de outros campos visualmente preenchidos; um usuário normal conseguiu abrir o formulário administrativo. Ambas as falhas foram reproduzidas e posteriormente marcadas com <code>test.fail()</code>. Os cinco cenários de obrigatoriedade passaram.</div>
-              <p class="muted">O teste de imagem verifica somente o nome do arquivo exibido na listagem, não o armazenamento ou recuperação do conteúdo. Formatos e limites de imagem não foram especificados. Unicidade do nome e limites numéricos seguem o contrato publicado em <a href="https://serverest.dev/swagger.json">serverest.dev/swagger.json</a>.</p>
-            </div>
-          </details>
-
-          <details>
-            <summary>Acessibilidade <span class="badge">7 testes</span></summary>
-            <div class="detail-body">
-              <p>Fonte: <a href="../tests/e2e/accessibility.spec.ts">accessibility.spec.ts</a></p>
-              <ol>
-                <li>Análise Axe WCAG 2.0 A/AA no login — marcada com <code>test.fail()</code> por violações conhecidas. <span class="expected">Falha esperada</span></li>
-                <li>Análise Axe WCAG 2.0 A/AA no cadastro público — marcada com <code>test.fail()</code>. <span class="expected">Falha esperada</span></li>
-                <li>Análise Axe WCAG 2.0 A/AA na home autenticada — marcada com <code>test.fail()</code>. <span class="expected">Falha esperada</span></li>
-                <li>Nomes acessíveis e alcance por teclado dos controles de login.</li>
-                <li>Nomes acessíveis e alcance por teclado dos controles de cadastro público.</li>
-                <li>Home autenticada: verificar que pelo menos um controle é alcançado por teclado.</li>
-                <li>Acesso por teclado ao controle de login na tela de cadastro — marcado com <code>test.fail()</code> pela ausência observada de elemento focável. <span class="expected">Falha esperada</span></li>
-              </ol>
-              <p class="muted"><code>test.fail()</code> significa que o Playwright espera uma falha, não que a aplicação passou. Quatro cenários de autorização e produtos também têm essa marcação. Se um cenário marcado passar, o Playwright reporta sucesso inesperado.</p>
-            </div>
-          </details>
-        </section>
-
-        <section id="suporte" class="panel">
-          <h2>Teste de suporte da pipeline</h2>
-          <p>Fonte: <a href="../scripts/generate-github-summary.test.mjs">generate-github-summary.test.mjs</a> · 1 teste</p>
-          <ol>
-            <li>Verificar que o resumo contabiliza separadamente aprovação, falha esperada, sucesso inesperado, falha, flaky e teste ignorado.</li>
-          </ol>
-          <p class="muted">Usa o runner nativo do Node.js. Não faz parte dos 81 cenários Playwright, não é executado por <code>npm test</code> e não está incluído no workflow atual. Foi executado com sucesso na validação anterior.</p>
-        </section>
-
-        <section id="execucao" class="panel">
-          <h2>Configuração, execução e CI</h2>
-          <ul>
-            <li><strong>Navegador e concorrência:</strong> Chromium, com um worker local e na CI.</li>
-            <li><strong>Timeouts:</strong> 30 segundos por teste, 5 por asserção, 10 por ação e 15 para navegação.</li>
-            <li><strong>CI:</strong> uma nova tentativa em falhas; um teste que passa apenas após retry é tratado como flaky e faz a execução falhar.</li>
-            <li><strong>Evidências:</strong> saída em lista, HTML, JUnit e JSON; screenshot em falhas e trace no primeiro retry.</li>
-            <li><strong>Pipeline:</strong> health check do frontend e API; instalação de dependências, auditoria, lint, typecheck, instalação de navegadores, testes, resumo e publicação de relatórios.</li>
-            <li><strong>Resumo da pipeline:</strong> falhas esperadas são contabilizadas separadamente dos testes aprovados e das falhas inesperadas.</li>
-            <li><strong>Dependências externas:</strong> acesso ao frontend e à API configurados; disponibilidade não garante sucesso nas operações de cadastro.</li>
-          </ul>
-          <h3>Comandos na raiz do projeto</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th scope="col">Objetivo</th><th scope="col">Comando</th></tr></thead>
-              <tbody>
-                <tr><td>Todos os testes</td><td><code>npm test</code></td></tr>
-                <tr><td>Testes E2E</td><td><code>npm run test:e2e</code></td></tr>
-                <tr><td>Login</td><td><code>npm run test:login</code></td></tr>
-                <tr><td>Cadastro de usuários e acesso administrativo</td><td><code>npm run test:register:user</code></td></tr>
-                <tr><td>Cadastro de produtos</td><td><code>npm run test:register:product</code></td></tr>
-                <tr><td>Acessibilidade</td><td><code>npm run test:a11y</code></td></tr>
-                <tr><td>Tipos / lint</td><td><code>npm run typecheck</code> / <code>npm run lint</code></td></tr>
-                <tr><td>Abrir relatório HTML</td><td><code>npm run report</code></td></tr>
-                <tr><td>Testar resumo da pipeline separadamente</td><td><code>node --test scripts/generate-github-summary.test.mjs</code></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="muted">Embora exista <code>npm run test:api</code>, <a href="../tests/api">tests/api</a> não contém cenários executáveis no estado analisado.</p>
-        </section>
-
-        <section id="atencao" class="panel">
-          <h2>Limitações e pontos de atenção</h2>
-          <ul>
-            <li>O ambiente público compartilhado está sujeito a indisponibilidade, concorrência e reset noturno.</li>
-            <li>O acesso de usuário normal às três rotas administrativas e a correção de formulário de produto falharam em 24/11/2026; os quatro cenários estão marcados como falhas esperadas, sem corrigir a aplicação.</li>
-            <li>Uma falha diferente ocorrida depois de uma marcação <code>test.fail()</code> também pode ser classificada como esperada; examine as evidências do relatório.</li>
-            <li>Limites de tamanho e tratamento de espaços no cadastro de usuários dependem de requisitos confirmados e não estão cobertos neste inventário.</li>
-            <li>Não há, nos cinco arquivos analisados, cenários implementados de compra ou carrinho.</li>
-            <li>Uma análise Axe automatizada, isoladamente, não garante conformidade integral de acessibilidade.</li>
-          </ul>
-        </section>
-      </article>
-    </div>
+  <header><div class="wrap"><h1>Inventário de cenários</h1><p>ServeRest Playwright · <a href="INVENTARIO_CENARIOS.md">Fonte em Markdown</a></p></div></header>
+  <main class="wrap layout">
+    <nav class="panel" aria-label="Navegação do inventário"><strong>Navegação</strong><a href="#section-1">Resumo</a><a href="#section-2">Organização do projeto</a><a href="#section-3">Cenários implementados</a><a href="#section-4">Configuração, execução e CI</a><a href="#section-5">Limitações e próximos pontos de atenção</a></nav>
+    <article><div class="intro"><p><strong>Referência dos cenários:</strong> 26/11/2026.</p>
+<p><strong>Escopo:</strong> estrutura local e cenários automatizados disponíveis no projeto.</p>
+</div><section id="section-1"><h2>Resumo</h2><p>O projeto automatiza a interface do ServeRest usando Playwright e TypeScript. Há <strong>82 testes Playwright</strong>: 81 E2E organizados em oito arquivos e um teste de limpeza de fixture, configurados para Chromium. Há também testes de scripts executados separadamente.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Área</th>
+<th>Arquivo</th>
+<th style="text-align:right">Testes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login</td>
+<td><a href="../tests/e2e/login.spec.ts">login.spec.ts</a></td>
+<td style="text-align:right">13</td>
+</tr>
+<tr>
+<td>Home</td>
+<td><a href="../tests/e2e/home.spec.ts">home.spec.ts</a></td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td>Cadastro público de usuários</td>
+<td><a href="../tests/e2e/register-user.spec.ts">register-user.spec.ts</a></td>
+<td style="text-align:right">17</td>
+</tr>
+<tr>
+<td>Cadastro administrativo de usuários</td>
+<td><a href="../tests/e2e/register-user-admin.spec.ts">register-user-admin.spec.ts</a></td>
+<td style="text-align:right">17</td>
+</tr>
+<tr>
+<td>Acesso administrativo de usuários</td>
+<td><a href="../tests/e2e/register-user-access.spec.ts">register-user-access.spec.ts</a></td>
+<td style="text-align:right">3</td>
+</tr>
+<tr>
+<td>Cadastro de produtos</td>
+<td><a href="../tests/e2e/register-product.spec.ts">register-product.spec.ts</a> e <a href="../tests/e2e/register-product-access.spec.ts">register-product-access.spec.ts</a></td>
+<td style="text-align:right">22</td>
+</tr>
+<tr>
+<td>Acessibilidade</td>
+<td><a href="../tests/e2e/accessibility.spec.ts">accessibility.spec.ts</a></td>
+<td style="text-align:right">7</td>
+</tr>
+<tr>
+<td>Limpeza da fixture de usuário</td>
+<td><a href="../tests/fixtures/user-cleanup.spec.ts">user-cleanup.spec.ts</a></td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td></td>
+<td style="text-align:right"><strong>82</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Implementado não significa aprovado.</strong> Na execução completa de <strong>26/11/2026 às 17h37 (UTC−3)</strong>, 74 testes passaram e 8 apresentaram falhas esperadas: quatro de acessibilidade e quatro de cadastro e autorização. O Playwright considerou a execução bem-sucedida, mas as falhas esperadas não significam que os defeitos foram corrigidos.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Área</th>
+<th style="text-align:right">Passaram</th>
+<th style="text-align:right">Falhas esperadas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login</td>
+<td style="text-align:right">13</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>Home</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>Cadastro público de usuários</td>
+<td style="text-align:right">17</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>Cadastro administrativo de usuários</td>
+<td style="text-align:right">17</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td>Acesso administrativo de usuários</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td>Cadastro de produtos</td>
+<td style="text-align:right">20</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td>Acessibilidade</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td>Limpeza da fixture de usuário</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">0</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td style="text-align:right"><strong>74</strong></td>
+<td style="text-align:right"><strong>8</strong></td>
+</tr>
+</tbody>
+</table></div>
+</section>
+<section id="section-2"><h2>Organização do projeto</h2><div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Local</th>
+<th>Responsabilidade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../tests/e2e">tests/e2e</a></td>
+<td>Cenários de interface, navegação e acessibilidade, organizados por funcionalidade.</td>
+</tr>
+<tr>
+<td><a href="../tests/api">tests/api</a></td>
+<td>Pasta reservada para testes de API; atualmente contém apenas um README, sem arquivos de teste.</td>
+</tr>
+<tr>
+<td><a href="../tests/fixtures">tests/fixtures</a></td>
+<td>Teste de integração que verifica a limpeza do usuário criado pela fixture.</td>
+</tr>
+<tr>
+<td><a href="../src/pages">src/pages</a></td>
+<td>Page Objects que centralizam seletores e ações de login, home, cadastro de usuários, listagem de usuários e cadastro de produtos.</td>
+</tr>
+<tr>
+<td><a href="../src/fixtures/test.ts">src/fixtures/test.ts</a></td>
+<td>Fixture <code>user</code>, responsável por criar um usuário normal ou administrador via API para o teste.</td>
+</tr>
+<tr>
+<td><a href="../src/api/users.api.ts">src/api/users.api.ts</a></td>
+<td>Cliente que cria usuários via <code>POST /usuarios</code> para preparar dados. É suporte aos testes E2E, não uma suíte de testes de API.</td>
+</tr>
+<tr>
+<td><a href="../src/api/products.api.ts">src/api/products.api.ts</a></td>
+<td>Cliente para consultar produtos usados nas verificações E2E.</td>
+</tr>
+<tr>
+<td><a href="../src/data">src/data</a></td>
+<td>Factories para gerar dados de usuários e produtos. O e-mail do usuário e o nome do produto usam UUID.</td>
+</tr>
+<tr>
+<td><a href="../src/config/env.ts">src/config/env.ts</a></td>
+<td>Configuração das URLs da aplicação e da API.</td>
+</tr>
+<tr>
+<td><a href="../playwright.config.ts">playwright.config.ts</a></td>
+<td>Configura navegador, workers, timeouts, retries e relatórios.</td>
+</tr>
+<tr>
+<td><a href="../.github/workflows/playwright.yml">.github/workflows/playwright.yml</a></td>
+<td>Pipeline de verificação dos serviços e execução dos testes.</td>
+</tr>
+<tr>
+<td><a href="../scripts/generate-github-summary.mjs">scripts/generate-github-summary.mjs</a></td>
+<td>Produz um resumo dos resultados no GitHub Actions.</td>
+</tr>
+<tr>
+<td><a href="../scripts/generate-github-summary.test.mjs">scripts/generate-github-summary.test.mjs</a></td>
+<td>Testa separadamente a classificação dos resultados no resumo.</td>
+</tr>
+<tr>
+<td><a href="QA_GUIDE.md">docs/QA_GUIDE.md</a></td>
+<td>Guia de instalação, execução e manutenção dos testes.</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Dados e reset noturno</h3>
+<p>O ambiente ServeRest é externo e <strong>apaga os dados à noite, inclusive usuários</strong>. Os testes usam dados gerados para cada execução; não devem depender de contas ou produtos de dias anteriores. A fixture tenta excluir somente o usuário criado por ela, usando o ID retornado pela API, e fecha o contexto mesmo se a exclusão falhar. Usuários criados pela interface e produtos não são excluídos pela fixture e podem permanecer até o reset. Uma interrupção abrupta também pode impedir a limpeza.</p>
+</section>
+<section id="section-3"><h2>Cenários implementados</h2><details><summary>1. Login — 13 testes</summary><div class="detail-body"><p>Fonte: <a href="../tests/e2e/login.spec.ts">login.spec.ts</a>.</p>
+<ol>
+<li>Login de usuário normal e navegação para a home.</li>
+<li>Login de administrador e navegação para a home.</li>
+<li>Login com e-mail e senha vazios, verificando os alertas dos dois campos.</li>
+<li>Login com e-mail vazio, verificando o alerta correspondente.</li>
+<li>Login com senha vazia, verificando o alerta correspondente.</li>
+<li>Tentativa com e-mail e senha inválidos.</li>
+<li>Tentativa com e-mail inválido e senha de um usuário criado para o teste.</li>
+<li>Tentativa com e-mail de um usuário criado para o teste e senha inválida.</li>
+<li>Exibição da tela de login e dos controles esperados.</li>
+<li>Tipos dos campos de e-mail e senha.</li>
+<li>Tentativa com formato de e-mail inválido.</li>
+<li>Preservação dos valores dos campos após tentativa malsucedida.</li>
+<li>Envio das credenciais com a tecla Enter.</li>
+</ol>
+<p><strong>Limite das verificações:</strong> nos casos de credenciais inválidas e formato inválido, o código verifica principalmente a permanência na rota de login; não valida uma mensagem específica de erro em todos eles.</p>
+</div></details><details><summary>2. Home — 2 testes</summary><div class="detail-body"><p>Fonte: <a href="../tests/e2e/home.spec.ts">home.spec.ts</a>.</p>
+<ol>
+<li>Usuário normal alcança a home após login.</li>
+<li>Administrador alcança a home após login.</li>
+</ol>
+<p>Esses testes validam a rota da home. Existem testes de login semelhantes, mas eles são contabilizados separadamente pelo runner.</p>
+</div></details><details><summary>3. Cadastro público de usuários — 17 testes</summary><div class="detail-body"><p>Fonte: <a href="../tests/e2e/register-user.spec.ts">register-user.spec.ts</a>.</p>
+<ol>
+<li>Cadastro de usuário normal com redirecionamento para a home.</li>
+<li>Login com usuário normal recém-cadastrado.</li>
+<li>Cadastro de administrador com redirecionamento para a home.</li>
+<li>Cadastro com nome contendo acentos e caracteres especiais, verificando a navegação para a home.</li>
+<li>Exibição da tela de cadastro e dos controles esperados.</li>
+<li>Tipos e atributos <code>name</code> dos campos.</li>
+<li>Todos os campos vazios, com os alertas de nome, e-mail e senha.</li>
+<li>Nome vazio, com o alerta correspondente.</li>
+<li>E-mail vazio, com o alerta correspondente.</li>
+<li>Senha vazia, com o alerta correspondente.</li>
+<li>Formato de e-mail inválido, verificando a validação nativa do campo.</li>
+<li>E-mail duplicado, verificando a mensagem apresentada.</li>
+<li>Preservação dos valores submetidos após erro de e-mail duplicado.</li>
+<li>Marcar e desmarcar a opção de administrador.</li>
+<li>Navegação para a tela de login.</li>
+<li>Envio do formulário com Enter.</li>
+<li>Campo de senha com tipo <code>password</code>.</li>
+</ol>
+<p>O teste de nome acentuado da tela pública confirma o redirecionamento; ele não consulta a persistência exata do nome.</p>
+</div></details><details><summary>4. Cadastro de usuários pela área administrativa — 17 testes</summary><div class="detail-body"><p>Fonte: <a href="../tests/e2e/register-user-admin.spec.ts">register-user-admin.spec.ts</a>.</p>
+<ol>
+<li>Cadastrar usuário normal e verificar seus dados na listagem.</li>
+<li>Cadastrar administrador e verificar seus dados e perfil na listagem.</li>
+<li>Cadastrar nome acentuado e verificar sua preservação na listagem.</li>
+<li>Fazer login com usuário normal recém-cadastrado.</li>
+<li>Exibir os controles da tela administrativa de cadastro.</li>
+<li>Verificar tipos e atributos <code>name</code> dos campos.</li>
+<li>Todos os campos vazios, com os alertas de nome, e-mail e senha.</li>
+<li>Nome vazio, com o alerta correspondente.</li>
+<li>E-mail vazio, com o alerta correspondente.</li>
+<li>Senha vazia, com o alerta correspondente.</li>
+<li>Formato de e-mail inválido, verificando a validação nativa do campo.</li>
+<li>E-mail duplicado, verificando a mensagem apresentada.</li>
+<li>Preservação dos valores após erro de e-mail duplicado, incluindo a opção de administrador.</li>
+<li>Marcar e desmarcar a opção de administrador.</li>
+<li>Navegar do cadastro administrativo para a lista de usuários.</li>
+<li>Enviar o formulário com Enter e verificar o usuário na lista.</li>
+<li>Campo de senha com tipo <code>password</code>.</li>
+</ol>
+<p>Nos cadastros bem-sucedidos validados na lista, <a href="../src/pages/users-list.page.ts">UsersListPage</a> verifica a rota, o cabeçalho e a linha correspondente ao e-mail, incluindo nome, e-mail, senha e valor <code>true</code> ou <code>false</code> da coluna Administrador. A coluna Ações não é validada.</p>
+</div></details><details><summary>5. Acesso às rotas administrativas de usuários — 3 testes</summary><div class="detail-body"><p>Fonte: <a href="../tests/e2e/register-user-access.spec.ts">register-user-access.spec.ts</a>.</p>
+<ol>
+<li>Sem autenticação, acessar diretamente as rotas administrativas de cadastro e listagem e verificar redirecionamento para login.</li>
+<li>Com usuário normal, verificar que o formulário administrativo de cadastro não é exposto — <strong>falha esperada</strong>.</li>
+<li>Com usuário normal, verificar que a lista administrativa de usuários não é exposta — <strong>falha esperada</strong>.</li>
+</ol>
+<p>As duas últimas expectativas estão marcadas com <code>test.fail()</code> após login e navegação: o frontend público permitiu os acessos indevidos. As falhas esperadas não reprovam a execução e não indicam que os defeitos foram corrigidos.</p>
+</div></details><details><summary>6. Cadastro de produtos — 22 testes</summary><div class="detail-body"><p>Fontes: <a href="../tests/e2e/register-product.spec.ts">register-product.spec.ts</a> e <a href="../tests/e2e/register-product-access.spec.ts">register-product-access.spec.ts</a>.</p>
+<p>Os cinco cenários de campos obrigatórios autenticam um administrador criado para o próprio teste e verificam a permanência na rota de cadastro.</p>
+<ol>
+<li>
+<p>Todos os campos obrigatórios vazios: verificar os quatro alertas de nome, preço, descrição e quantidade.</p>
+</li>
+<li>
+<p>Nome vazio, com os demais valores preenchidos: esperar somente o alerta de nome obrigatório.</p>
+</li>
+<li>
+<p>Preço vazio, com os demais valores preenchidos: esperar somente o alerta de preço obrigatório.</p>
+</li>
+<li>
+<p>Descrição vazia, com os demais valores preenchidos: esperar somente o alerta de descrição obrigatória.</p>
+</li>
+<li>
+<p>Quantidade vazia, com os demais valores preenchidos: esperar somente o alerta de quantidade obrigatória.</p>
+</li>
+<li>
+<p>Cadastro sem imagem e verificação dos dados na listagem.</p>
+</li>
+<li>
+<p>Cadastro com imagem e verificação do nome do arquivo após atualizar a listagem.</p>
+</li>
+<li>
+<p>Cadastro com preço mínimo de 1 e quantidade zero.</p>
+</li>
+<li>
+<p>Preservação de acentos no nome e na descrição.</p>
+</li>
+<li>
+<p>Navegação para o formulário pelo cartão da home; os demais cenários administrativos usam o menu.</p>
+</li>
+<li>
+<p>Nome duplicado: alerta, preservação dos valores e ausência de outro registro.</p>
+</li>
+<li>
+<p>Correção do nome ausente e tentativa de concluir o cadastro — <strong>falha esperada</strong>.</p>
+</li>
+<li>
+<p>Rejeição de preço zero.</p>
+</li>
+<li>
+<p>Rejeição de preço negativo.</p>
+</li>
+<li>
+<p>Rejeição de quantidade negativa.</p>
+</li>
+<li>
+<p>Rejeição de preço decimal pela validação nativa.</p>
+</li>
+<li>
+<p>Rejeição de quantidade decimal pela validação nativa.</p>
+</li>
+<li>
+<p>Envio do formulário com Enter.</p>
+</li>
+<li>
+<p>Duplo clique no envio sem criação de produto duplicado.</p>
+</li>
+<li>
+<p>Rótulos e ordem de navegação por teclado nos controles do formulário.</p>
+</li>
+<li>
+<p>Acesso sem autenticação redirecionado para login.</p>
+</li>
+<li>
+<p>Usuário normal não deve ter acesso ao formulário administrativo — <strong>falha esperada</strong>.</p>
+</li>
+</ol>
+<p>Na execução de 24/11/2026, <strong>20 passaram e 2 falharam</strong>: ao corrigir o nome, o formulário apresentou alertas de outros campos que continuavam visualmente preenchidos; um usuário normal conseguiu abrir o formulário administrativo. Ambas as falhas foram reproduzidas e os cenários foram posteriormente marcados com <code>test.fail()</code>. Nessa execução, os cinco cenários de obrigatoriedade passaram.</p>
+<p>O teste de imagem verifica apenas o nome do arquivo exibido na listagem, não o armazenamento ou a recuperação do conteúdo. Formatos e limites de imagem não foram especificados. Unicidade do nome e limites numéricos seguem o contrato publicado em <code>https://serverest.dev/swagger.json</code>.</p>
+</div></details><details><summary>7. Acessibilidade — 7 testes</summary><div class="detail-body"><p>Fonte: <a href="../tests/e2e/accessibility.spec.ts">accessibility.spec.ts</a>.</p>
+<ol>
+<li>Análise automatizada Axe WCAG 2.0 A/AA na tela de login — marcada com <code>test.fail()</code> por violações conhecidas.</li>
+<li>Análise Axe WCAG 2.0 A/AA no cadastro público — marcada com <code>test.fail()</code>.</li>
+<li>Análise Axe WCAG 2.0 A/AA na home autenticada — marcada com <code>test.fail()</code>.</li>
+<li>Nomes acessíveis e alcance por teclado dos controles de login.</li>
+<li>Nomes acessíveis e alcance por teclado dos controles de cadastro público.</li>
+<li>Home autenticada: verificar que pelo menos um controle é alcançado por teclado.</li>
+<li>Acesso por teclado ao controle de login na tela de cadastro — marcado com <code>test.fail()</code> porque o frontend foi identificado sem elemento focável para esse controle.</li>
+</ol>
+<p><code>test.fail()</code> significa que o Playwright <strong>espera que o cenário falhe</strong>; não significa que a aplicação passou na verificação. Além desses testes de acessibilidade, quatro cenários de autorização e produtos também estão marcados como falhas esperadas. Se um cenário marcado passar, o Playwright reporta sucesso inesperado.</p>
+</div></details><details><summary>8. Limpeza da fixture — 1 teste Playwright</summary><div class="detail-body"><p>Fonte: <a href="../tests/fixtures/user-cleanup.spec.ts">user-cleanup.spec.ts</a>.</p>
+<ol>
+<li>Criar um usuário pela fixture e verificar pela API, após o teste, que ele foi removido.</li>
+</ol>
+</div></details><details><summary>9. Testes de scripts — 3 testes</summary><div class="detail-body"><p>Fontes: <a href="../scripts/generate-github-summary.test.mjs">generate-github-summary.test.mjs</a> e <a href="../scripts/generate-inventory.test.mjs">generate-inventory.test.mjs</a>.</p>
+<ol>
+<li>Verificar que o resumo contabiliza separadamente aprovação, falha esperada, sucesso inesperado, falha, flaky e teste ignorado.</li>
+<li>Verificar que o inventário é renderizado com navegação, tabelas, cenários expansíveis e conteúdo HTML escapado.</li>
+<li>Garantir que o inventário gerado seja o mesmo com quebras de linha de Windows ou Unix.</li>
+</ol>
+<p>Esses testes usam o runner nativo do Node.js. <strong>Não fazem parte dos 82 testes Playwright</strong> nem são executados por <code>npm test</code>; são executados separadamente na CI por <code>npm run test:scripts</code>.</p>
+</div></details></section>
+<section id="section-4"><h2>Configuração, execução e CI</h2><ul>
+<li><strong>Navegador:</strong> Chromium, em um único projeto do Playwright.</li>
+<li><strong>Concorrência:</strong> um worker local e na CI.</li>
+<li><strong>Timeouts:</strong> 30 segundos por teste, 5 segundos por asserção, 10 segundos por ação e 15 segundos para navegação.</li>
+<li><strong>CI:</strong> uma nova tentativa em caso de falha; um teste que passa apenas após retry é tratado como flaky e faz a execução falhar.</li>
+<li><strong>Evidências:</strong> saída em lista, HTML, JUnit e JSON; screenshot em falhas e trace na primeira tentativa repetida.</li>
+<li><strong>Pipeline:</strong> Node 22.20.0, health check, instalação de dependências, auditoria, lint, typecheck, teste do resumo, instalação de navegadores, execução dos testes, resumo e publicação de relatórios.</li>
+<li><strong>Inventário:</strong> este Markdown é a fonte; <code>npm run inventory</code> atualiza o HTML e <code>npm run inventory:check</code> verifica se ele está sincronizado.</li>
+<li><strong>Resumo da pipeline:</strong> falhas esperadas são contabilizadas separadamente dos testes aprovados e das falhas inesperadas.</li>
+<li><strong>Dependências externas:</strong> a execução requer acesso ao frontend e à API configurados; uma verificação de disponibilidade não garante que todas as operações de cadastro funcionarão.</li>
+</ul>
+<p>Comandos na raiz do projeto:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Objetivo</th>
+<th>Comando</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Todos os testes</td>
+<td><code>npm test</code></td>
+</tr>
+<tr>
+<td>Testes E2E</td>
+<td><code>npm run test:e2e</code></td>
+</tr>
+<tr>
+<td>Login</td>
+<td><code>npm run test:login</code></td>
+</tr>
+<tr>
+<td>Cadastro de usuários e acesso administrativo</td>
+<td><code>npm run test:register:user</code></td>
+</tr>
+<tr>
+<td>Cadastro de produtos</td>
+<td><code>npm run test:register:product</code></td>
+</tr>
+<tr>
+<td>Acessibilidade</td>
+<td><code>npm run test:a11y</code></td>
+</tr>
+<tr>
+<td>Verificar tipos / lint</td>
+<td><code>npm run typecheck</code> / <code>npm run lint</code></td>
+</tr>
+<tr>
+<td>Abrir relatório HTML</td>
+<td><code>npm run report</code></td>
+</tr>
+<tr>
+<td>Testar scripts separadamente</td>
+<td><code>npm run test:scripts</code></td>
+</tr>
+<tr>
+<td>Gerar / verificar inventário HTML</td>
+<td><code>npm run inventory</code> / <code>npm run inventory:check</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>A pasta <a href="../tests/api">tests/api</a> não contém cenários executáveis. Os clientes de API são usados como suporte aos testes E2E.</p>
+</section>
+<section id="section-5"><h2>Limitações e próximos pontos de atenção</h2><ul>
+<li>A suíte depende do ambiente público compartilhado; indisponibilidade, concorrência de outras execuções e o reset noturno podem afetar os resultados.</li>
+<li>O acesso de usuário normal às três rotas administrativas e a correção de formulário de produto falharam em 24/11/2026; os quatro cenários estão marcados como falhas esperadas, sem corrigir a aplicação.</li>
+<li>Uma falha diferente ocorrida depois de uma marcação <code>test.fail()</code> também pode ser classificada como esperada; examine as evidências do relatório.</li>
+<li>Regras de borda de cadastro de usuários, como limites de tamanho e tratamento de espaços, dependem de requisitos confirmados e não estão cobertas aqui.</li>
+<li>Não há neste inventário cenários de compra ou carrinho implementados.</li>
+<li>A análise Axe automatizada não garante, por si só, conformidade integral de acessibilidade.</li>
+</ul>
+</section></article>
   </main>
-  <footer class="wrap">ServeRest Playwright · Inventário de 24/11/2026 · Consulte o <a href="INVENTARIO_CENARIOS.md">documento original</a> para detalhes.</footer>
+  <footer class="wrap">Gerado a partir de INVENTARIO_CENARIOS.md.</footer>
 </body>
 </html>

@@ -1,6 +1,6 @@
 import { expect, test } from '../../src/fixtures/test.js';
 import { createProductData } from '../../src/data/product.factory.js';
-import { environment } from '../../src/config/env.js';
+import { ProductsApi } from '../../src/api/products.api.js';
 import { HomePage } from '../../src/pages/home.page.js';
 import { LoginPage } from '../../src/pages/login.page.js';
 import { ProductsListPage } from '../../src/pages/products-list.page.js';
@@ -28,11 +28,7 @@ async function openProductRegistration(
 }
 
 async function expectProductCount(request: APIRequestContext, name: string, count: number): Promise<void> {
-  const response = await request.get(`${environment.apiBaseUrl}/produtos`, {
-    params: { nome: name },
-  });
-  expect(response.ok(), `Product lookup failed with HTTP ${response.status()}`).toBe(true);
-  const result = await response.json();
+  const result = await new ProductsApi(request).findByName(name);
   expect(result.quantidade).toBe(count);
   expect(result.produtos).toHaveLength(count);
   for (const product of result.produtos) {
@@ -61,7 +57,6 @@ test.describe('Product registration required fields', () => {
     await expect(page.getByRole('alert')).toHaveCount(4);
     await expect(page).toHaveURL(/\/admin\/cadastrarprodutos(?:$|[?#])/);
   });
-
   for (const field of ['Nome', 'Preço', 'Descrição', 'Quantidade'] satisfies ProductRequiredField[]) {
     test(`reports only the missing ${field.toLowerCase()} when other values are valid`, async ({ page, user }) => {
       const productRegisterPage = await openProductRegistration(page, user);
@@ -251,29 +246,5 @@ test.describe('Product registration', () => {
       await page.keyboard.press('Tab');
       await expect(control).toBeFocused();
     }
-  });
-});
-
-test.describe('Product registration access control', () => {
-  test('redirects an unauthenticated visit to login', async ({ page }) => {
-    await page.goto('/admin/cadastrarprodutos');
-
-    await expect(page).toHaveURL(/\/login(?:$|[?#])/);
-    await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Cadastro de Produtos' })).toHaveCount(0);
-  });
-
-  test('does not expose product registration to a normal user', async ({ page, user }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.open();
-    await loginPage.login(user.email, user.password);
-    await new HomePage(page).expectLoaded();
-
-    await page.goto('/admin/cadastrarprodutos');
-
-    test.fail(true, 'The external frontend exposes the product registration page to normal users.');
-    await expect.soft(page).not.toHaveURL(/\/admin\/cadastrarprodutos(?:$|[?#])/);
-    await expect.soft(page.getByRole('heading', { name: 'Cadastro de Produtos' })).toHaveCount(0);
-    await expect.soft(page.getByRole('button', { name: 'Cadastrar', exact: true })).toHaveCount(0);
   });
 });

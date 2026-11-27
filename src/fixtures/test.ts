@@ -17,12 +17,20 @@ export const test = base.extend<UserFixtures>({
       timeout: 10_000,
     });
 
+    const usersApi = new UsersApi(apiContext);
+    let userId: string | undefined;
     try {
       const user = createUserData(userRole);
-      await new UsersApi(apiContext).create(user);
+      userId = await usersApi.create(user);
       await use(user);
     } finally {
-      await apiContext.dispose();
+      try {
+        if (userId) {
+          await usersApi.delete(userId);
+        }
+      } finally {
+        await apiContext.dispose();
+      }
     }
   },
 });

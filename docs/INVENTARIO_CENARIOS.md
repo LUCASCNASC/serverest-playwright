@@ -1,23 +1,26 @@
 # Inventário de cenários — ServeRest Playwright
 
-**Referência:** 24/11/2026.
+**Referência dos cenários:** 26/11/2026.
 
 **Escopo:** estrutura local e cenários automatizados disponíveis no projeto.
 
 ## Resumo
 
-O projeto automatiza a interface do ServeRest usando Playwright e TypeScript. A listagem do runner identificou **81 testes Playwright em cinco arquivos**, todos configurados para Chromium. Há também **1 teste de suporte** para o resumo da pipeline, executado separadamente.
+O projeto automatiza a interface do ServeRest usando Playwright e TypeScript. Há **82 testes Playwright**: 81 E2E organizados em oito arquivos e um teste de limpeza de fixture, configurados para Chromium. Há também testes de scripts executados separadamente.
 
 | Área | Arquivo | Testes |
 |---|---|---:|
 | Login | [login.spec.ts](../tests/e2e/login.spec.ts) | 13 |
 | Home | [home.spec.ts](../tests/e2e/home.spec.ts) | 2 |
-| Cadastro de usuários e acesso administrativo | [register-user.spec.ts](../tests/e2e/register-user.spec.ts) | 37 |
-| Cadastro de produtos | [register-product.spec.ts](../tests/e2e/register-product.spec.ts) | 22 |
+| Cadastro público de usuários | [register-user.spec.ts](../tests/e2e/register-user.spec.ts) | 17 |
+| Cadastro administrativo de usuários | [register-user-admin.spec.ts](../tests/e2e/register-user-admin.spec.ts) | 17 |
+| Acesso administrativo de usuários | [register-user-access.spec.ts](../tests/e2e/register-user-access.spec.ts) | 3 |
+| Cadastro de produtos | [register-product.spec.ts](../tests/e2e/register-product.spec.ts) e [register-product-access.spec.ts](../tests/e2e/register-product-access.spec.ts) | 22 |
 | Acessibilidade | [accessibility.spec.ts](../tests/e2e/accessibility.spec.ts) | 7 |
-| **Total** | | **81** |
+| Limpeza da fixture de usuário | [user-cleanup.spec.ts](../tests/fixtures/user-cleanup.spec.ts) | 1 |
+| **Total** | | **82** |
 
-**Implementado não significa aprovado.** A última execução completa disponível começou em **24/11/2026 às 10h10 (UTC−3)**. Dos 81 testes Playwright, 73 passaram e 8 apresentaram falhas esperadas: quatro de acessibilidade e quatro de cadastro e autorização. O Playwright considerou a execução bem-sucedida, mas as falhas esperadas não significam que os defeitos foram corrigidos. A conferência atual listou os testes sem executá-los novamente.
+**Implementado não significa aprovado.** Na execução completa de **26/11/2026 às 17h37 (UTC−3)**, 74 testes passaram e 8 apresentaram falhas esperadas: quatro de acessibilidade e quatro de cadastro e autorização. O Playwright considerou a execução bem-sucedida, mas as falhas esperadas não significam que os defeitos foram corrigidos.
 
 | Área | Passaram | Falhas esperadas |
 |---|---:|---:|
@@ -28,7 +31,8 @@ O projeto automatiza a interface do ServeRest usando Playwright e TypeScript. A 
 | Acesso administrativo de usuários | 1 | 2 |
 | Cadastro de produtos | 20 | 2 |
 | Acessibilidade | 3 | 4 |
-| **Total** | **73** | **8** |
+| Limpeza da fixture de usuário | 1 | 0 |
+| **Total** | **74** | **8** |
 
 ## Organização do projeto
 
@@ -36,9 +40,11 @@ O projeto automatiza a interface do ServeRest usando Playwright e TypeScript. A 
 |---|---|
 | [tests/e2e](../tests/e2e) | Cenários de interface, navegação e acessibilidade, organizados por funcionalidade. |
 | [tests/api](../tests/api) | Pasta reservada para testes de API; atualmente contém apenas um README, sem arquivos de teste. |
+| [tests/fixtures](../tests/fixtures) | Teste de integração que verifica a limpeza do usuário criado pela fixture. |
 | [src/pages](../src/pages) | Page Objects que centralizam seletores e ações de login, home, cadastro de usuários, listagem de usuários e cadastro de produtos. |
 | [src/fixtures/test.ts](../src/fixtures/test.ts) | Fixture `user`, responsável por criar um usuário normal ou administrador via API para o teste. |
 | [src/api/users.api.ts](../src/api/users.api.ts) | Cliente que cria usuários via `POST /usuarios` para preparar dados. É suporte aos testes E2E, não uma suíte de testes de API. |
+| [src/api/products.api.ts](../src/api/products.api.ts) | Cliente para consultar produtos usados nas verificações E2E. |
 | [src/data](../src/data) | Factories para gerar dados de usuários e produtos. O e-mail do usuário e o nome do produto usam UUID. |
 | [src/config/env.ts](../src/config/env.ts) | Configuração das URLs da aplicação e da API. |
 | [playwright.config.ts](../playwright.config.ts) | Configura navegador, workers, timeouts, retries e relatórios. |
@@ -49,7 +55,7 @@ O projeto automatiza a interface do ServeRest usando Playwright e TypeScript. A 
 
 ### Dados e reset noturno
 
-O ambiente ServeRest é externo e **apaga os dados à noite, inclusive usuários**. Os testes usam dados gerados para cada execução; não devem depender de contas ou produtos de dias anteriores. A fixture fecha o contexto de API ao final, mas não exclui os usuários criados. Cenários de sucesso também criam produtos; esses registros permanecem no ambiente até o reset.
+O ambiente ServeRest é externo e **apaga os dados à noite, inclusive usuários**. Os testes usam dados gerados para cada execução; não devem depender de contas ou produtos de dias anteriores. A fixture tenta excluir somente o usuário criado por ela, usando o ID retornado pela API, e fecha o contexto mesmo se a exclusão falhar. Usuários criados pela interface e produtos não são excluídos pela fixture e podem permanecer até o reset. Uma interrupção abrupta também pode impedir a limpeza.
 
 ## Cenários implementados
 
@@ -108,7 +114,7 @@ O teste de nome acentuado da tela pública confirma o redirecionamento; ele não
 
 ### 4. Cadastro de usuários pela área administrativa — 17 testes
 
-Fonte: [register-user.spec.ts](../tests/e2e/register-user.spec.ts).
+Fonte: [register-user-admin.spec.ts](../tests/e2e/register-user-admin.spec.ts).
 
 1. Cadastrar usuário normal e verificar seus dados na listagem.
 2. Cadastrar administrador e verificar seus dados e perfil na listagem.
@@ -132,7 +138,7 @@ Nos cadastros bem-sucedidos validados na lista, [UsersListPage](../src/pages/use
 
 ### 5. Acesso às rotas administrativas de usuários — 3 testes
 
-Fonte: [register-user.spec.ts](../tests/e2e/register-user.spec.ts).
+Fonte: [register-user-access.spec.ts](../tests/e2e/register-user-access.spec.ts).
 
 1. Sem autenticação, acessar diretamente as rotas administrativas de cadastro e listagem e verificar redirecionamento para login.
 2. Com usuário normal, verificar que o formulário administrativo de cadastro não é exposto — **falha esperada**.
@@ -142,7 +148,7 @@ As duas últimas expectativas estão marcadas com `test.fail()` após login e na
 
 ### 6. Cadastro de produtos — 22 testes
 
-Fonte: [register-product.spec.ts](../tests/e2e/register-product.spec.ts).
+Fontes: [register-product.spec.ts](../tests/e2e/register-product.spec.ts) e [register-product-access.spec.ts](../tests/e2e/register-product-access.spec.ts).
 
 Os cinco cenários de campos obrigatórios autenticam um administrador criado para o próprio teste e verificam a permanência na rota de cadastro.
 
@@ -188,13 +194,21 @@ Fonte: [accessibility.spec.ts](../tests/e2e/accessibility.spec.ts).
 
 `test.fail()` significa que o Playwright **espera que o cenário falhe**; não significa que a aplicação passou na verificação. Além desses testes de acessibilidade, quatro cenários de autorização e produtos também estão marcados como falhas esperadas. Se um cenário marcado passar, o Playwright reporta sucesso inesperado.
 
-### 8. Teste de suporte da pipeline — 1 teste
+### 8. Limpeza da fixture — 1 teste Playwright
 
-Fonte: [generate-github-summary.test.mjs](../scripts/generate-github-summary.test.mjs).
+Fonte: [user-cleanup.spec.ts](../tests/fixtures/user-cleanup.spec.ts).
+
+1. Criar um usuário pela fixture e verificar pela API, após o teste, que ele foi removido.
+
+### 9. Testes de scripts — 3 testes
+
+Fontes: [generate-github-summary.test.mjs](../scripts/generate-github-summary.test.mjs) e [generate-inventory.test.mjs](../scripts/generate-inventory.test.mjs).
 
 1. Verificar que o resumo contabiliza separadamente aprovação, falha esperada, sucesso inesperado, falha, flaky e teste ignorado.
+2. Verificar que o inventário é renderizado com navegação, tabelas, cenários expansíveis e conteúdo HTML escapado.
+3. Garantir que o inventário gerado seja o mesmo com quebras de linha de Windows ou Unix.
 
-Esse teste usa o runner nativo do Node.js. **Não faz parte dos 81 cenários Playwright**, não é executado por `npm test` e não está incluído no workflow atual. Foi executado com sucesso na validação anterior.
+Esses testes usam o runner nativo do Node.js. **Não fazem parte dos 82 testes Playwright** nem são executados por `npm test`; são executados separadamente na CI por `npm run test:scripts`.
 
 ## Configuração, execução e CI
 
@@ -203,7 +217,8 @@ Esse teste usa o runner nativo do Node.js. **Não faz parte dos 81 cenários Pla
 - **Timeouts:** 30 segundos por teste, 5 segundos por asserção, 10 segundos por ação e 15 segundos para navegação.
 - **CI:** uma nova tentativa em caso de falha; um teste que passa apenas após retry é tratado como flaky e faz a execução falhar.
 - **Evidências:** saída em lista, HTML, JUnit e JSON; screenshot em falhas e trace na primeira tentativa repetida.
-- **Pipeline:** health check do frontend e da API; instalação de dependências, auditoria, lint, typecheck, instalação de navegadores, execução dos testes, resumo e publicação de relatórios.
+- **Pipeline:** Node 22.20.0, health check, instalação de dependências, auditoria, lint, typecheck, teste do resumo, instalação de navegadores, execução dos testes, resumo e publicação de relatórios.
+- **Inventário:** este Markdown é a fonte; `npm run inventory` atualiza o HTML e `npm run inventory:check` verifica se ele está sincronizado.
 - **Resumo da pipeline:** falhas esperadas são contabilizadas separadamente dos testes aprovados e das falhas inesperadas.
 - **Dependências externas:** a execução requer acesso ao frontend e à API configurados; uma verificação de disponibilidade não garante que todas as operações de cadastro funcionarão.
 
@@ -219,9 +234,10 @@ Comandos na raiz do projeto:
 | Acessibilidade | `npm run test:a11y` |
 | Verificar tipos / lint | `npm run typecheck` / `npm run lint` |
 | Abrir relatório HTML | `npm run report` |
-| Testar resumo da pipeline separadamente | `node --test scripts/generate-github-summary.test.mjs` |
+| Testar scripts separadamente | `npm run test:scripts` |
+| Gerar / verificar inventário HTML | `npm run inventory` / `npm run inventory:check` |
 
-Embora exista `npm run test:api`, a pasta [tests/api](../tests/api) não contém cenários executáveis no estado analisado.
+A pasta [tests/api](../tests/api) não contém cenários executáveis. Os clientes de API são usados como suporte aos testes E2E.
 
 ## Limitações e próximos pontos de atenção
 
@@ -229,5 +245,5 @@ Embora exista `npm run test:api`, a pasta [tests/api](../tests/api) não contém
 - O acesso de usuário normal às três rotas administrativas e a correção de formulário de produto falharam em 24/11/2026; os quatro cenários estão marcados como falhas esperadas, sem corrigir a aplicação.
 - Uma falha diferente ocorrida depois de uma marcação `test.fail()` também pode ser classificada como esperada; examine as evidências do relatório.
 - Regras de borda de cadastro de usuários, como limites de tamanho e tratamento de espaços, dependem de requisitos confirmados e não estão cobertas aqui.
-- Não há neste inventário cenários de compra ou carrinho implementados nos cinco arquivos analisados.
+- Não há neste inventário cenários de compra ou carrinho implementados.
 - A análise Axe automatizada não garante, por si só, conformidade integral de acessibilidade.
